@@ -51,7 +51,7 @@ table{border-collapse:collapse;width:100%;font-size:12px}th,td{padding:10px 12px
 <header>
   <div class="brand">
     <div class="logo">EX</div>
-    <div><h1>Dashboard de Expedição</h1><div class="subtitle">Estoque - Fazendinha II - Análise operacional</div><div id="dataSourceStatus" class="data-source-status">Fonte: carregando dados externos...</div></div>
+    <div><h1>Dashboard de Expedição</h1><div class="subtitle">Estoque - Fazendinha II - Análise operacional</div><div id="dataSourceStatus" class="data-source-status">Fonte: carregando dados externos...</div><div id="lastUpdate" class="data-source-status">Última atualização: carregando...</div></div>
   </div>
   <div class="actions"><button class="btn" id="dataBtn">↻ Atualizar dados</button><button class="btn" id="themeBtn">☾ Tema escuro</button></div>
 </header>
@@ -138,11 +138,11 @@ function parseDate(v){
  return isNaN(d)?null:d;
 }
 function slaDays(r){
- const ini=parseDate(r["Data e hora criadas"]);
- if(!ini) return null;
+ const base=parseDate(r["Data de liberação"])||parseDate(r["Data e hora criadas"]);
+ if(!base) return null;
  const hoje=new Date(); hoje.setHours(0,0,0,0);
- const dataPedido=new Date(ini); dataPedido.setHours(0,0,0,0);
- return Math.max(0,Math.floor((hoje-dataPedido)/86400000));
+ const dataBase=new Date(base); dataBase.setHours(0,0,0,0);
+ return Math.max(0,Math.floor((hoje-dataBase)/86400000));
 }
 function slaClass(v){return v===null?"":(v<=1?"sla-green":(v===2?"sla-yellow":"sla-red"))}
 function slaHtml(r){const v=slaDays(r); if(v===null)return "—"; return `<span class="sla-wrap"><span class="sla-dot ${slaClass(v)}"></span><span>${fmtInt(v)}</span></span>`;}
@@ -254,18 +254,29 @@ async function fetchDashboardData(){
   const url=DATA_FILE+"?v="+Date.now();
   const resp=await fetch(url,{cache:"no-store"});
   if(!resp.ok)throw new Error("Arquivo de dados não encontrado (HTTP "+resp.status+").");
-  let bytes;
   const buffer=await resp.arrayBuffer();
-  if(window.DecompressionStream){
+  const rawBytes=new Uint8Array(buffer);
+  let bytes;
+  // GitHub Pages pode entregar o .gz como bytes compactados ou como conteúdo
+  // já descompactado pelo servidor/navegador. Detectamos o formato pelo
+  // cabeçalho GZIP para evitar uma segunda descompressão.
+  const isGzip=rawBytes.length>=2 && rawBytes[0]===0x1f && rawBytes[1]===0x8b;
+  if(isGzip){
+   if(!window.DecompressionStream){
+    throw new Error("Seu navegador não suporta leitura do arquivo de dados compactado. Use Google Chrome ou Microsoft Edge atualizado.");
+   }
    const ds=new DecompressionStream("gzip");
    bytes=await new Response(new Blob([buffer]).stream().pipeThrough(ds)).arrayBuffer();
   }else{
-   throw new Error("Seu navegador não suporta leitura do arquivo de dados compactado. Use Google Chrome ou Microsoft Edge atualizado.");
+   bytes=buffer;
   }
   const text=new TextDecoder("utf-8").decode(bytes);
-  const rows=JSON.parse(text);
+  const payload=JSON.parse(text);
+  const rows=Array.isArray(payload)?payload:payload.data;
+  const updatedAt=Array.isArray(payload)?"":payload.updated_at;
   if(!Array.isArray(rows)||!rows.length)throw new Error("O arquivo de dados está vazio ou inválido.");
   DATA=rows;
+  $("lastUpdate").textContent=updatedAt?`Última atualização: ${safeFileDate(updatedAt)}`:"Última atualização: não informada";
   rebuildMonthOptions();
   fillSelect("orderType","TIPO_ORDEM","Todos os tipos de ordem");
   fillSelect("status","STATUS FINAL","Todos os status");
