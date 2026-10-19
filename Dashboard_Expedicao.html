@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dashboard de Expedição</title>
+<link rel="icon" type="image/png" href="g.coluna.png">
 <style>
 :root{
   --bg:#f5f7fb;--card:#fff;--text:#172033;--muted:#667085;--border:#e6e9ef;
@@ -44,6 +45,13 @@ table{border-collapse:collapse;width:100%;font-size:12px}th,td{padding:10px 12px
 .multi-select{position:relative;min-width:0}.multi-btn{width:100%;text-align:left;border:1px solid var(--border);background:var(--card);color:var(--text);border-radius:10px;padding:9px 12px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.multi-btn:hover{border-color:var(--accent)}.multi-menu{display:none;position:absolute;top:calc(100% + 6px);left:0;right:0;z-index:20;background:var(--card);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);padding:8px;max-height:260px;overflow:auto}.multi-select.open .multi-menu{display:block}.multi-option{display:flex;align-items:center;gap:8px;padding:8px 7px;border-radius:8px;font-size:12px;cursor:pointer}.multi-option:hover{background:var(--bg)}.multi-option input{accent-color:var(--accent)}.multi-actions{display:flex;gap:6px;padding:5px 7px 8px;border-bottom:1px solid var(--border);margin-bottom:4px}.multi-actions button{flex:1;border:1px solid var(--border);background:var(--bg);color:var(--text);border-radius:7px;padding:6px;font-size:11px;cursor:pointer}.daily-card{margin-bottom:16px}.daily-table-wrap{overflow:auto;border:1px solid var(--border);border-radius:12px;max-height:360px}.daily-table{min-width:1100px}.daily-table th,.daily-table td{text-align:center;padding:8px 9px}.daily-table th:first-child,.daily-table td:first-child{text-align:left;position:sticky;left:0;background:var(--card);z-index:2;font-weight:800}.daily-table thead th{position:sticky;top:0;background:var(--card);z-index:3}.daily-table .day-cell{font-weight:700}.daily-table .has-value{background:rgba(4,100,252,.10)}.daily-total{font-weight:900;background:var(--bg)!important}.daily-legend{font-size:11px;color:var(--muted);margin-top:8px}
 @media(max-width:1000px){.kpis{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:1fr}.filters{grid-template-columns:1fr 1fr}.pillars{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:600px){.container{padding:14px}.kpis{grid-template-columns:1fr}.filters{grid-template-columns:1fr}.pillars{grid-template-columns:1fr}header{align-items:flex-start;flex-direction:column}}
+/* Complementos restritos às novas análises */
+.pillar-metrics{font-size:11px;color:var(--muted);margin-top:8px;line-height:1.5}
+.observation{position:relative;display:inline-block;color:var(--accent);font-weight:800;cursor:help;border-bottom:1px dotted var(--accent)}
+.observation .observation-card{display:none;position:absolute;bottom:calc(100% + 7px);left:0;z-index:8;min-width:220px;max-width:310px;white-space:normal;padding:12px;background:var(--card);border:1px solid var(--border);border-radius:10px;box-shadow:var(--shadow);color:var(--text);font-weight:400;line-height:1.7}
+.observation:hover .observation-card,.observation:focus .observation-card{display:block}
+.ticket-table{max-height:410px}.ticket-table th{z-index:3}
+.ticket-age{font-weight:800;color:var(--accent)}
 </style>
 </head>
 <body>
@@ -71,6 +79,8 @@ table{border-collapse:collapse;width:100%;font-size:12px}th,td{padding:10px 12px
       <div id="docStatusOptions"></div>
     </div>
   </div>
+  <select class="select" id="agendamentoStatus"><option value="">Todos os status de agendamento</option></select>
+  <select class="select" id="chamadoStatus"><option value="">Todos os status chamado</option></select>
   <select class="select" id="month"><option value="">Todos os meses</option></select>
   <input class="select" id="search" placeholder="Buscar OV, cliente, série...">
 </div>
@@ -84,7 +94,7 @@ table{border-collapse:collapse;width:100%;font-size:12px}th,td{padding:10px 12px
 
 <div class="grid">
   <div class="card chart-card"><div class="chart-title">Evolução mensal</div><div class="chart-sub">Pedidos e unidades pela data de movimentação</div><canvas id="monthly"></canvas></div>
-  <div class="card chart-card"><div class="chart-title">Distribuição por pilar</div><div class="chart-sub">Participação das ordens no conjunto filtrado</div><canvas id="pillarChart"></canvas></div>
+  <div class="card chart-card"><div class="chart-title">Distribuição por pilar</div><div class="chart-sub">Participação das ordens no conjunto filtrado • pedidos e unidades por pilar</div><canvas id="pillarChart"></canvas></div>
 </div>
 
 <div class="card chart-card daily-card">
@@ -104,10 +114,14 @@ table{border-collapse:collapse;width:100%;font-size:12px}th,td{padding:10px 12px
 <div class="card table-card">
   <div class="table-head"><div><div class="chart-title" style="margin:0">Detalhamento</div><div class="chart-sub" style="margin:3px 0 0">Exibindo os registros conforme os filtros aplicados</div></div><div id="countRows" class="subtitle"></div></div>
   <div class="table-wrap"><table><thead><tr>
-    <th>OV</th><th>Cliente</th><th>Pilar</th><th>Canal</th><th>Status</th><th>Qtd.</th><th>Data</th><th>SLA (dias)</th><th>Área</th><th>Estado</th>
+    <th>OV</th><th>Cliente</th><th>Pilar</th><th>Canal</th><th>Status</th><th>Qtd.</th><th>Data</th><th>SLA (dias)</th><th>Área</th><th>Estado</th><th>Status solicitação</th><th>Tipo de solicitação</th><th>Observação</th>
   </tr></thead><tbody id="tbody"></tbody></table></div>
 </div>
 
+  <div class="card table-card" style="margin-top:16px;margin-bottom:16px" id="ticketsPanel">
+    <div class="table-head"><div><div class="chart-title" style="margin:0">Chamados pendentes · SLA de atendimento</div><div class="chart-sub" style="margin:3px 0 0">Chamados com coluna T = Não • dias corridos desde a criação</div></div><div id="ticketsCount" class="subtitle"></div></div>
+    <div class="table-wrap ticket-table"><table><thead><tr><th>ID</th><th>Criado por</th><th>Solicitante</th><th>Data criada</th><th>Tipo de solicitação</th><th>Canal de venda</th><th>SLA (dias)</th></tr></thead><tbody id="ticketsBody"></tbody></table></div>
+  </div>
 <div class="card table-card" style="margin-top:16px">
   <div class="table-head"><div><div class="chart-title" style="margin:0">Transportadoras</div><div class="chart-sub" style="margin:3px 0 0">Pedidos únicos pela coluna B e quantidade total pela coluna K, conforme os filtros aplicados</div></div><div id="countCarriers" class="subtitle"></div></div>
   <div class="table-wrap"><table><thead><tr><th>Transportadora</th><th>Pedidos únicos</th><th>Quantidade total</th></tr></thead><tbody id="carrierBody"></tbody></table></div>
@@ -115,6 +129,7 @@ table{border-collapse:collapse;width:100%;font-size:12px}th,td{padding:10px 12px
 
 <script>
 let DATA = [];
+let CHAMADOS = [];
 const COLORS={MPS:"#0464FC",MOBILE:"#04C4FC",PC:"#9444FC",AUTOMATION:"#D404BC",SUCATA:"#060608",ACESSÓRIOS:"#FDF4A9"};
 const $=id=>document.getElementById(id);
 const fmtInt=n=>new Intl.NumberFormat("pt-BR",{maximumFractionDigits:0}).format(n||0);
@@ -165,11 +180,18 @@ function setupDocStatusFilter(){
 function getSelectedDocStatuses(){return [...document.querySelectorAll("input[data-doc-status]:checked")].map(x=>x.value)}
 function updateDocStatusButton(){const vals=getSelectedDocStatuses();$("docStatusBtn").textContent=vals.length?`${vals.length} status selecionado${vals.length>1?"s":""}`:"Todos os status do documento";}
 
+function orderKey(v){return norm(v).toUpperCase().replace(/\s+/g,"")}
+function extraStatus(r,key){return norm(r[key])}
+function splitValues(v){return norm(v).split(" | ").map(x=>x.trim()).filter(Boolean)}
+function fillMultiValueSelect(id,col,label){const vals=[...new Set(DATA.flatMap(r=>splitValues(r[col])))].sort((a,b)=>a.localeCompare(b,"pt-BR"));$(id).innerHTML=`<option value="">${label}</option>`;vals.forEach(v=>{const o=document.createElement("option");o.value=v;o.textContent=v;$(id).appendChild(o)})}
+function observationHtml(r){const serie=norm(r["CHAMADO_SERIE"]);if(!serie)return "—";return `<span class="observation" tabindex="0">${escapeHtml(serie)}<span class="observation-card"><b>Detalhes do chamado</b><div><b>Criado por:</b> ${escapeHtml(r["CHAMADO_CRIADO_POR"]||"—")}</div><div><b>Solicitante:</b> ${escapeHtml(r["CHAMADO_SOLICITANTE"]||"—")}</div></span></span>`}
+function ticketAge(r){const d=parseDate(r.criada);if(!d)return null;const today=new Date();today.setHours(0,0,0,0);d.setHours(0,0,0,0);return Math.max(0,Math.floor((today-d)/86400000))}
+function renderTickets(){const allowed=new Set(filtered.map(r=>orderKey(r["Ordem de venda"])).filter(Boolean));const s=$("chamadoStatus").value;const tickets=CHAMADOS.filter(r=>norm(r.pendente).toLowerCase()==="não"||norm(r.pendente).toLowerCase()==="nao").filter(r=>(!s||norm(r.tipo)===s)&&(!r.ov||allowed.has(orderKey(r.ov))));tickets.sort((a,b)=>(ticketAge(b)??-1)-(ticketAge(a)??-1));$("ticketsCount").textContent=fmtInt(tickets.length)+" chamados pendentes";$("ticketsBody").innerHTML=tickets.map(r=>`<tr><td>${escapeHtml(r.id)}</td><td>${escapeHtml(r.criado_por)}</td><td>${escapeHtml(r.solicitante)}</td><td>${escapeHtml(safeDateLabel(r.criada))}</td><td>${escapeHtml(r.tipo)}</td><td>${escapeHtml(r.canal)}</td><td class="ticket-age">${ticketAge(r)===null?"—":fmtInt(ticketAge(r))}</td></tr>`).join("")||'<tr><td colspan="7" class="empty">Nenhum chamado pendente encontrado.</td></tr>'}
 let filtered=DATA, charts={};
 function getFiltered(){
- const t=$("orderType").value,s=$("status").value,c=$("channel").value,a=$("area").value,dc=$("deliveryCondition").value,ci=$("customItems").value,dep=$("department").value,m=$("month").value,q=norm($("search").value).toLowerCase(),ds=getSelectedDocStatuses();
+ const t=$("orderType").value,s=$("status").value,c=$("channel").value,a=$("area").value,dc=$("deliveryCondition").value,ci=$("customItems").value,dep=$("department").value,ag=$("agendamentoStatus").value,cs=$("chamadoStatus").value,m=$("month").value,q=norm($("search").value).toLowerCase(),ds=getSelectedDocStatuses();
  return DATA.filter(r=>
-   (!t||norm(r.TIPO_ORDEM)===t)&&(!s||norm(r["STATUS FINAL"])===s)&&(!c||norm(r.CANAL)===c)&&(!a||norm(r["ÁREA"])===a)&&(!dc||norm(r["Condições de entrega"])===dc)&&(!ci||norm(r["Possui Itens Customizados"])===ci)&&(!dep||norm(r["DEPARTAMENTO"])===dep)&&(!m||norm(r.MES_FILTRO)===m)&&(ds.length===0||ds.includes(norm(r["Status do documento"])))&&
+   (!t||norm(r.TIPO_ORDEM)===t)&&(!s||norm(r["STATUS FINAL"])===s)&&(!c||norm(r.CANAL)===c)&&(!a||norm(r["ÁREA"])===a)&&(!dc||norm(r["Condições de entrega"])===dc)&&(!ci||norm(r["Possui Itens Customizados"])===ci)&&(!dep||norm(r["DEPARTAMENTO"])===dep)&&(!ag||splitValues(extraStatus(r,"AGENDAMENTO_STATUS")).includes(ag))&&(!cs||splitValues(extraStatus(r,"CHAMADO_TIPO")).includes(cs))&&(!m||norm(r.MES_FILTRO)===m)&&(ds.length===0||ds.includes(norm(r["Status do documento"])))&&
    (!q||[r["Ordem de venda"],r.Nome,r["Número de Série do Equipamento"],r["Referência de cliente"]].some(x=>norm(x).toLowerCase().includes(q)))
  )
 }
@@ -211,12 +233,12 @@ function drawDailyMatrix(rows){
  $("dailyBody").innerHTML=months.map(m=>{let total=Object.values(byMonth[m]).reduce((a,b)=>a+b,0);return '<tr><td>'+monthLabel(m)+'</td>'+Array.from({length:31},(_,i)=>{let v=byMonth[m][i+1]||0;const arrowClass=v<=200?"daily-green":(v<=220?"daily-yellow":"daily-red");return `<td class="day-cell ${v?'has-value':''}">${v?`<span class="daily-arrow ${arrowClass}">↑</span>${fmtInt(v)}`:'—'}</td>`}).join('')+`<td class="daily-total">${fmtInt(total)}</td></tr>`}).join('')||'<tr><td colspan="33" class="empty">Sem dados para o filtro selecionado.</td></tr>';
 }
 function drawDonut(rows){
- const {ctx,w,h}=clearCanvas($("pillarChart"));let counts={};rows.forEach(r=>{let p=norm(r.PILAR)||"Sem pilar";counts[p]=(counts[p]||0)+1});
+ const {ctx,w,h}=clearCanvas($("pillarChart"));let counts={},units={};rows.forEach(r=>{let p=norm(r.PILAR)||"Sem pilar";counts[p]=(counts[p]||0)+1;units[p]=(units[p]||0)+toNumber(r.Quantidade)});
  let vals=Object.entries(counts).sort((a,b)=>b[1]-a[1]),total=rows.length||1,cx=w*.38,cy=h/2,rad=Math.min(w,h)*.30,start=-Math.PI/2;
  vals.forEach(([k,v])=>{let ang=v/total*Math.PI*2;ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,rad,start,start+ang);ctx.closePath();ctx.fillStyle=COLORS[k]||"#98a2b3";ctx.fill();start+=ang});
  ctx.beginPath();ctx.fillStyle=getComputedStyle(document.body).getPropertyValue("--card");ctx.arc(cx,cy,rad*.58,0,Math.PI*2);ctx.fill();
  ctx.fillStyle=getComputedStyle(document.body).getPropertyValue("--text");ctx.textAlign="center";ctx.font="bold 20px Segoe UI";ctx.fillText(fmtInt(rows.length),cx,cy+6);
- ctx.textAlign="left";ctx.font="11px Segoe UI";let y=28;vals.forEach(([k,v])=>{ctx.fillStyle=COLORS[k]||"#98a2b3";ctx.fillRect(w*.68,y-9,10,10);ctx.fillStyle=getComputedStyle(document.body).getPropertyValue("--text");ctx.fillText(k+"  "+fmtInt(v),w*.68+16,y);y+=22});
+ ctx.textAlign="left";ctx.font="11px Segoe UI";let y=28;vals.forEach(([k,v])=>{ctx.fillStyle=COLORS[k]||"#98a2b3";ctx.fillRect(w*.68,y-9,10,10);ctx.fillStyle=getComputedStyle(document.body).getPropertyValue("--text");ctx.fillText(k+"  "+fmtInt(v)+" pedidos",w*.68+16,y);ctx.fillStyle=getComputedStyle(document.body).getPropertyValue("--muted");ctx.fillText(fmtInt(units[k])+" unidades",w*.68+16,y+12);y+=37});
 }
 function render(){
  filtered=getFiltered();
@@ -226,13 +248,13 @@ function render(){
  $("kExp").textContent=fmtInt(filtered.filter(r=>norm(r["STATUS FINAL"])==="EXPEDIDO").length);
  $("kPend").textContent=fmtInt(filtered.filter(r=>norm(r["STATUS FINAL"])==="PENDENTE").length);
  drawLineChart(filtered);drawDailyReleased(filtered);drawDonut(filtered);
- const pcs={};filtered.forEach(r=>{const p=norm(r.PILAR)||"Sem pilar";pcs[p]=(pcs[p]||0)+1});
+ const pcs={},punits={};filtered.forEach(r=>{const p=norm(r.PILAR)||"Sem pilar";pcs[p]=(pcs[p]||0)+1;punits[p]=(punits[p]||0)+toNumber(r.Quantidade)});
  const max=Math.max(...Object.values(pcs),1);
- $("pillarCards").innerHTML=Object.entries(COLORS).map(([p,c])=>`<div class="pillar"><div class="pillar-top"><span>${p}</span><span>${fmtInt(pcs[p]||0)}</span></div><div class="bar"><div class="fill" style="width:${((pcs[p]||0)/max)*100}%;background:${c}"></div></div></div>`).join("");
+ $("pillarCards").innerHTML=Object.entries(COLORS).map(([p,c])=>`<div class="pillar"><div class="pillar-top"><span>${p}</span><span>${fmtInt(pcs[p]||0)} pedidos</span></div><div class="pillar-metrics">${fmtInt(punits[p]||0)} unidades</div><div class="bar"><div class="fill" style="width:${((pcs[p]||0)/max)*100}%;background:${c}"></div></div></div>`).join("");
  $("countRows").textContent=fmtInt(filtered.length)+" registros";
  const detailRows=[...filtered].sort((a,b)=>{const sa=slaDays(a),sb=slaDays(b);if(sa===null&&sb===null)return 0;if(sa===null)return 1;if(sb===null)return -1;return sb-sa});
- $("tbody").innerHTML=detailRows.slice(0,1000).map(r=>`<tr><td>${escapeHtml(r["Ordem de venda"])}</td><td>${escapeHtml(r.Nome)}</td><td><span class="pillar-cell ${norm(r.PILAR).replace(/[^A-Za-z]/g,"")}">${escapeHtml(r.PILAR)}</span></td><td>${escapeHtml(r.CANAL)}</td><td class="status ${norm(r["STATUS FINAL"])}">${escapeHtml(r["STATUS FINAL"])}</td><td>${fmtInt(r.Quantidade)}</td><td>${escapeHtml(safeDateLabel(r.DATA_DETALHAMENTO))}</td><td>${slaHtml(r)}</td><td>${escapeHtml(r["ÁREA"])}</td><td>${escapeHtml(r.Estado)}</td></tr>`).join("")||'<tr><td colspan="10" class="empty">Sem dados para o filtro selecionado.</td></tr>';
- renderCarrierTable(filtered);
+ $("tbody").innerHTML=detailRows.slice(0,1000).map(r=>`<tr><td>${escapeHtml(r["Ordem de venda"])}</td><td>${escapeHtml(r.Nome)}</td><td><span class="pillar-cell ${norm(r.PILAR).replace(/[^A-Za-z]/g,"")}">${escapeHtml(r.PILAR)}</span></td><td>${escapeHtml(r.CANAL)}</td><td class="status ${norm(r["STATUS FINAL"])}">${escapeHtml(r["STATUS FINAL"])}</td><td>${fmtInt(r.Quantidade)}</td><td>${escapeHtml(safeDateLabel(r.DATA_DETALHAMENTO))}</td><td>${slaHtml(r)}</td><td>${escapeHtml(r["ÁREA"])}</td><td>${escapeHtml(r.Estado)}</td><td>${escapeHtml(r.AGENDAMENTO_STATUS||"—")}</td><td>${escapeHtml(r.CHAMADO_TIPO||"—")}</td><td>${observationHtml(r)}</td></tr>`).join("")||'<tr><td colspan="13" class="empty">Sem dados para o filtro selecionado.</td></tr>';
+  renderCarrierTable(filtered);renderTickets();
 }
 function renderCarrierTable(rows){
  const groups=new Map();
@@ -280,7 +302,7 @@ async function fetchDashboardData(){
   const rows=Array.isArray(payload)?payload:payload.data;
   const updatedAt=Array.isArray(payload)?"":payload.updated_at;
   if(!Array.isArray(rows)||!rows.length)throw new Error("O arquivo de dados está vazio ou inválido.");
-  DATA=rows;
+   DATA=rows;CHAMADOS=Array.isArray(payload.chamados)?payload.chamados:[];
   $("lastUpdate").textContent=updatedAt?`Última atualização: ${safeFileDate(updatedAt)}`:"Última atualização: não informada";
   rebuildMonthOptions();
   fillSelect("orderType","TIPO_ORDEM","Todos os tipos de ordem");
@@ -289,7 +311,9 @@ async function fetchDashboardData(){
   fillSelect("area","ÁREA","Todas as áreas");
   fillSelect("deliveryCondition","Condições de entrega","Todas as condições de entrega");
   fillSelect("customItems","Possui Itens Customizados","Todos os itens customizados");
-  fillSelect("department","DEPARTAMENTO","Todos os departamentos");
+   fillSelect("department","DEPARTAMENTO","Todos os departamentos");
+   fillMultiValueSelect("agendamentoStatus","AGENDAMENTO_STATUS","Todos os status de agendamento");
+   fillMultiValueSelect("chamadoStatus","CHAMADO_TIPO","Todos os status chamado");
   const box=$("docStatusOptions");
   box.innerHTML=unique("Status do documento").map(v=>`<label class="multi-option"><input type="checkbox" value="${escapeHtml(v)}" data-doc-status> <span>${escapeHtml(v)}</span></label>`).join("");
   box.querySelectorAll("input[data-doc-status]").forEach(el=>el.addEventListener("change",()=>{updateDocStatusButton();render()}));
@@ -309,9 +333,10 @@ function initializeControls(){
  fillSelect("status","STATUS FINAL","Todos os status");
  fillSelect("channel","CANAL","Todos os canais");
  fillSelect("area","ÁREA","Todas as áreas");fillSelect("deliveryCondition","Condições de entrega","Todas as condições de entrega");fillSelect("customItems","Possui Itens Customizados","Todos os itens customizados");fillSelect("department","DEPARTAMENTO","Todos os departamentos");
+ fillMultiValueSelect("agendamentoStatus","AGENDAMENTO_STATUS","Todos os status de agendamento");fillMultiValueSelect("chamadoStatus","CHAMADO_TIPO","Todos os status chamado");
  rebuildMonthOptions();
  setupDocStatusFilter();
- ["orderType","status","channel","area","deliveryCondition","customItems","department","month"].forEach(id=>$(id).addEventListener("change",render));
+ ["orderType","status","channel","area","deliveryCondition","customItems","department","agendamentoStatus","chamadoStatus","month"].forEach(id=>$(id).addEventListener("change",render));
  $("search").addEventListener("input",render);
  $("themeBtn").addEventListener("click",()=>{let dark=document.body.dataset.theme==="dark";document.body.dataset.theme=dark?"":"dark";$("themeBtn").textContent=dark?"☾ Tema escuro":"☀ Tema claro";render();});
  window.addEventListener("resize",render);
