@@ -52,6 +52,20 @@ table{border-collapse:collapse;width:100%;font-size:12px}th,td{padding:10px 12px
 .observation:hover .observation-card,.observation:focus .observation-card{display:block}
 .ticket-table{max-height:410px}.ticket-table th{z-index:3}
 .ticket-age{font-weight:800;color:var(--accent)}
+
+/* Ajustes visuais solicitados: chips e card de observação no padrão operacional. */
+.ticket-tag{display:inline-block;padding:6px 10px;border-radius:7px;font-weight:800;max-width:300px;white-space:normal;line-height:1.4;border:1px solid transparent}
+.ticket-tag-type{background:rgba(148,68,252,.16);border-color:rgba(148,68,252,.34);color:var(--text)}
+.ticket-tag-channel{background:rgba(4,196,252,.13);border-color:rgba(4,196,252,.32);color:var(--text)}
+.observation{display:inline-flex;align-items:center;gap:7px;border-bottom:none;color:var(--text);font-weight:500;max-width:260px;cursor:help}
+.observation-indicator{width:16px;height:16px;display:grid;place-items:center;border:1px solid var(--accent);border-radius:5px;color:var(--accent);font-size:11px;line-height:1;flex-shrink:0}
+.observation-preview{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:230px}
+.observation:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.observation-floating-card{position:fixed;z-index:99999;width:min(360px,calc(100vw - 24px));padding:15px 16px;background:#101923;color:#eaf1f8;border:1px solid #354d62;border-radius:12px;box-shadow:0 12px 35px rgba(0,0,0,.32);font-size:12px;line-height:1.65;pointer-events:none;white-space:normal;overflow-wrap:anywhere}
+.observation-floating-card[hidden]{display:none}
+.observation-card-title{color:#04C4FC;font-weight:800;font-size:13px;margin-bottom:7px}
+.observation-card-divider{border-top:1px solid #354d62;margin:10px 0}
+.observation-serial{font-weight:700}
 </style>
 </head>
 <body>
@@ -119,14 +133,21 @@ table{border-collapse:collapse;width:100%;font-size:12px}th,td{padding:10px 12px
 </div>
 
   <div class="card table-card" style="margin-top:16px;margin-bottom:16px" id="ticketsPanel">
-    <div class="table-head"><div><div class="chart-title" style="margin:0">Chamados pendentes · SLA de atendimento</div><div class="chart-sub" style="margin:3px 0 0">Chamados com coluna T = Não • dias corridos desde a criação</div></div><div id="ticketsCount" class="subtitle"></div></div>
-    <div class="table-wrap ticket-table"><table><thead><tr><th>ID</th><th>Criado por</th><th>Solicitante</th><th>Data criada</th><th>Tipo de solicitação</th><th>Canal de venda</th><th>SLA (dias)</th></tr></thead><tbody id="ticketsBody"></tbody></table></div>
+    <div class="table-head"><div><div class="chart-title" style="margin:0">Chamados pendentes · SLA de atendimento</div><div class="chart-sub" style="margin:3px 0 0">Análise do fluxo de chamados • pendências e SLA de atendimento</div></div><div id="ticketsCount" class="subtitle"></div></div>
+    <div class="table-wrap ticket-table"><table><thead><tr><th>ID</th><th>Ordem de venda</th><th>Criado por</th><th>Solicitante</th><th>Data criada</th><th>Tipo de solicitação</th><th>Canal de venda</th><th>SLA (dias)</th></tr></thead><tbody id="ticketsBody"></tbody></table></div>
   </div>
 <div class="card table-card" style="margin-top:16px">
   <div class="table-head"><div><div class="chart-title" style="margin:0">Transportadoras</div><div class="chart-sub" style="margin:3px 0 0">Pedidos únicos pela coluna B e quantidade total pela coluna K, conforme os filtros aplicados</div></div><div id="countCarriers" class="subtitle"></div></div>
   <div class="table-wrap"><table><thead><tr><th>Transportadora</th><th>Pedidos únicos</th><th>Quantidade total</th></tr></thead><tbody id="carrierBody"></tbody></table></div>
 </div>
 
+<div id="observationFloatingCard" class="observation-floating-card" role="tooltip" hidden>
+  <div class="observation-card-title">Observação operacional</div>
+  <div><b>Criado por:</b> <span class="observation-created"></span></div>
+  <div><b>Solicitante:</b> <span class="observation-requester"></span></div>
+  <div class="observation-card-divider"></div>
+  <div class="observation-serial"></div>
+</div>
 <script>
 let DATA = [];
 let CHAMADOS = [];
@@ -184,9 +205,20 @@ function orderKey(v){return norm(v).toUpperCase().replace(/\s+/g,"")}
 function extraStatus(r,key){return norm(r[key])}
 function splitValues(v){return norm(v).split(" | ").map(x=>x.trim()).filter(Boolean)}
 function fillMultiValueSelect(id,col,label){const vals=[...new Set(DATA.flatMap(r=>splitValues(r[col])))].sort((a,b)=>a.localeCompare(b,"pt-BR"));$(id).innerHTML=`<option value="">${label}</option>`;vals.forEach(v=>{const o=document.createElement("option");o.value=v;o.textContent=v;$(id).appendChild(o)})}
-function observationHtml(r){const serie=norm(r["CHAMADO_SERIE"]);if(!serie)return "—";return `<span class="observation" tabindex="0">${escapeHtml(serie)}<span class="observation-card"><b>Detalhes do chamado</b><div><b>Criado por:</b> ${escapeHtml(r["CHAMADO_CRIADO_POR"]||"—")}</div><div><b>Solicitante:</b> ${escapeHtml(r["CHAMADO_SOLICITANTE"]||"—")}</div></span></span>`}
+function observationHtml(r){const serie=norm(r["CHAMADO_SERIE"]);if(!serie)return "—";return `<span class="observation" tabindex="0" data-created="${escapeHtml(r["CHAMADO_CRIADO_POR"]||"—")}" data-requester="${escapeHtml(r["CHAMADO_SOLICITANTE"]||"—")}"><span class="observation-indicator" aria-hidden="true">●</span><span class="observation-preview">${escapeHtml(serie)}</span></span>`}
+// Card flutuante fora da tabela: não é cortado pela rolagem horizontal/vertical.
+let activeObservation=null;
+function hideObservation(){const card=$("observationFloatingCard");if(card)card.hidden=true;activeObservation=null}
+function showObservation(el){const card=$("observationFloatingCard");if(!card)return;activeObservation=el;card.querySelector(".observation-created").textContent=el.dataset.created||"—";card.querySelector(".observation-requester").textContent=el.dataset.requester||"—";card.querySelector(".observation-serial").textContent=el.querySelector(".observation-preview")?.textContent||"—";card.hidden=false;const rect=el.getBoundingClientRect(),width=card.offsetWidth,height=card.offsetHeight;let left=Math.max(12,Math.min(rect.left,window.innerWidth-width-12));let top=rect.top-height-10;if(top<12)top=Math.min(window.innerHeight-height-12,rect.bottom+10);card.style.left=left+"px";card.style.top=Math.max(12,top)+"px"}
+document.addEventListener("pointerover",e=>{const el=e.target.closest?.(".observation");if(el&&el!==activeObservation)showObservation(el)});
+document.addEventListener("pointerout",e=>{if(activeObservation&&e.target.closest?.(".observation")===activeObservation&&!activeObservation.contains(e.relatedTarget))hideObservation()});
+document.addEventListener("focusin",e=>{const el=e.target.closest?.(".observation");if(el)showObservation(el)});
+document.addEventListener("focusout",e=>{if(e.target.closest?.(".observation"))hideObservation()});
+document.addEventListener("scroll",hideObservation,true);
+window.addEventListener("resize",hideObservation);
+
 function ticketAge(r){const d=parseDate(r.criada);if(!d)return null;const today=new Date();today.setHours(0,0,0,0);d.setHours(0,0,0,0);return Math.max(0,Math.floor((today-d)/86400000))}
-function renderTickets(){const allowed=new Set(filtered.map(r=>orderKey(r["Ordem de venda"])).filter(Boolean));const s=$("chamadoStatus").value;const tickets=CHAMADOS.filter(r=>norm(r.pendente).toLowerCase()==="não"||norm(r.pendente).toLowerCase()==="nao").filter(r=>(!s||norm(r.tipo)===s)&&(!r.ov||allowed.has(orderKey(r.ov))));tickets.sort((a,b)=>(ticketAge(b)??-1)-(ticketAge(a)??-1));$("ticketsCount").textContent=fmtInt(tickets.length)+" chamados pendentes";$("ticketsBody").innerHTML=tickets.map(r=>`<tr><td>${escapeHtml(r.id)}</td><td>${escapeHtml(r.criado_por)}</td><td>${escapeHtml(r.solicitante)}</td><td>${escapeHtml(safeDateLabel(r.criada))}</td><td>${escapeHtml(r.tipo)}</td><td>${escapeHtml(r.canal)}</td><td class="ticket-age">${ticketAge(r)===null?"—":fmtInt(ticketAge(r))}</td></tr>`).join("")||'<tr><td colspan="7" class="empty">Nenhum chamado pendente encontrado.</td></tr>'}
+function renderTickets(){const allowed=new Set(filtered.map(r=>orderKey(r["Ordem de venda"])).filter(Boolean));const s=$("chamadoStatus").value;const tickets=CHAMADOS.filter(r=>norm(r.pendente).toLowerCase()==="não"||norm(r.pendente).toLowerCase()==="nao").filter(r=>(!s||norm(r.tipo)===s)&&(!r.ov||allowed.has(orderKey(r.ov))));tickets.sort((a,b)=>(ticketAge(b)??-1)-(ticketAge(a)??-1));$("ticketsCount").textContent=fmtInt(tickets.length)+" chamados pendentes";$("ticketsBody").innerHTML=tickets.map(r=>`<tr><td>${escapeHtml(r.id)}</td><td>${escapeHtml(r.ov||"—")}</td><td>${escapeHtml(r.criado_por)}</td><td>${escapeHtml(r.solicitante)}</td><td>${escapeHtml(safeDateLabel(r.criada))}</td><td>${escapeHtml(r.tipo)}</td><td>${escapeHtml(r.canal)}</td><td class="ticket-age">${ticketAge(r)===null?"—":fmtInt(ticketAge(r))}</td></tr>`).join("")||'<tr><td colspan="8" class="empty">Nenhum chamado pendente encontrado.</td></tr>'}
 let filtered=DATA, charts={};
 function getFiltered(){
  const t=$("orderType").value,s=$("status").value,c=$("channel").value,a=$("area").value,dc=$("deliveryCondition").value,ci=$("customItems").value,dep=$("department").value,ag=$("agendamentoStatus").value,cs=$("chamadoStatus").value,m=$("month").value,q=norm($("search").value).toLowerCase(),ds=getSelectedDocStatuses();
