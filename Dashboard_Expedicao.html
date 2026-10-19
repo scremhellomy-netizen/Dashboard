@@ -66,6 +66,10 @@ table{border-collapse:collapse;width:100%;font-size:12px}th,td{padding:10px 12px
 .observation-card-title{color:#04C4FC;font-weight:800;font-size:13px;margin-bottom:7px}
 .observation-card-divider{border-top:1px solid #354d62;margin:10px 0}
 .observation-serial{font-weight:700}
+/* Ajustes pontuais: centralização do indicador e destaques na tabela de chamados. */
+.observation-cell{text-align:center}
+.observation{justify-content:center}
+.ticket-tag-ov{background:rgba(4,100,252,.14);border-color:rgba(4,100,252,.32);color:var(--text)}
 </style>
 </head>
 <body>
@@ -205,7 +209,7 @@ function orderKey(v){return norm(v).toUpperCase().replace(/\s+/g,"")}
 function extraStatus(r,key){return norm(r[key])}
 function splitValues(v){return norm(v).split(" | ").map(x=>x.trim()).filter(Boolean)}
 function fillMultiValueSelect(id,col,label){const vals=[...new Set(DATA.flatMap(r=>splitValues(r[col])))].sort((a,b)=>a.localeCompare(b,"pt-BR"));$(id).innerHTML=`<option value="">${label}</option>`;vals.forEach(v=>{const o=document.createElement("option");o.value=v;o.textContent=v;$(id).appendChild(o)})}
-function observationHtml(r){const serie=norm(r["CHAMADO_SERIE"]);if(!serie)return "—";return `<span class="observation" tabindex="0" data-created="${escapeHtml(r["CHAMADO_CRIADO_POR"]||"—")}" data-requester="${escapeHtml(r["CHAMADO_SOLICITANTE"]||"—")}"><span class="observation-indicator" aria-hidden="true">●</span><span class="observation-preview">${escapeHtml(serie)}</span></span>`}
+function observationHtml(r){const serie=norm(r["CHAMADO_SERIE"]);if(!serie)return "—";return `<span class="observation" tabindex="0" data-created="${escapeHtml(r["CHAMADO_CRIADO_POR"]||"—")}" data-requester="${escapeHtml(r["CHAMADO_SOLICITANTE"]||"—")}"><span class="observation-indicator" aria-hidden="true">●</span><span class="observation-preview" hidden>${escapeHtml(serie)}</span></span>`}
 // Card flutuante fora da tabela: não é cortado pela rolagem horizontal/vertical.
 let activeObservation=null;
 function hideObservation(){const card=$("observationFloatingCard");if(card)card.hidden=true;activeObservation=null}
@@ -218,7 +222,7 @@ document.addEventListener("scroll",hideObservation,true);
 window.addEventListener("resize",hideObservation);
 
 function ticketAge(r){const d=parseDate(r.criada);if(!d)return null;const today=new Date();today.setHours(0,0,0,0);d.setHours(0,0,0,0);return Math.max(0,Math.floor((today-d)/86400000))}
-function renderTickets(){const allowed=new Set(filtered.map(r=>orderKey(r["Ordem de venda"])).filter(Boolean));const s=$("chamadoStatus").value;const tickets=CHAMADOS.filter(r=>norm(r.pendente).toLowerCase()==="não"||norm(r.pendente).toLowerCase()==="nao").filter(r=>(!s||norm(r.tipo)===s)&&(!r.ov||allowed.has(orderKey(r.ov))));tickets.sort((a,b)=>(ticketAge(b)??-1)-(ticketAge(a)??-1));$("ticketsCount").textContent=fmtInt(tickets.length)+" chamados pendentes";$("ticketsBody").innerHTML=tickets.map(r=>`<tr><td>${escapeHtml(r.id)}</td><td>${escapeHtml(r.ov||"—")}</td><td>${escapeHtml(r.criado_por)}</td><td>${escapeHtml(r.solicitante)}</td><td>${escapeHtml(safeDateLabel(r.criada))}</td><td>${escapeHtml(r.tipo)}</td><td>${escapeHtml(r.canal)}</td><td class="ticket-age">${ticketAge(r)===null?"—":fmtInt(ticketAge(r))}</td></tr>`).join("")||'<tr><td colspan="8" class="empty">Nenhum chamado pendente encontrado.</td></tr>'}
+function renderTickets(){const allowed=new Set(filtered.map(r=>orderKey(r["Ordem de venda"])).filter(Boolean));const s=$("chamadoStatus").value;const tickets=CHAMADOS.filter(r=>norm(r.pendente).toLowerCase()==="não"||norm(r.pendente).toLowerCase()==="nao").filter(r=>(!s||norm(r.tipo)===s)&&(!r.ov||allowed.has(orderKey(r.ov))));tickets.sort((a,b)=>(ticketAge(b)??-1)-(ticketAge(a)??-1));$("ticketsCount").textContent=fmtInt(tickets.length)+" chamados pendentes";$("ticketsBody").innerHTML=tickets.map(r=>`<tr><td>${escapeHtml(r.id)}</td><td><span class="ticket-tag ticket-tag-ov">${escapeHtml(r.ov||"—")}</span></td><td>${escapeHtml(r.criado_por)}</td><td>${escapeHtml(r.solicitante)}</td><td>${escapeHtml(safeDateLabel(r.criada))}</td><td><span class="ticket-tag ticket-tag-type">${escapeHtml(r.tipo)}</span></td><td><span class="ticket-tag ticket-tag-channel">${escapeHtml(r.canal)}</span></td><td class="ticket-age">${ticketAge(r)===null?"—":fmtInt(ticketAge(r))}</td></tr>`).join("")||'<tr><td colspan="8" class="empty">Nenhum chamado pendente encontrado.</td></tr>'}
 let filtered=DATA, charts={};
 function getFiltered(){
  const t=$("orderType").value,s=$("status").value,c=$("channel").value,a=$("area").value,dc=$("deliveryCondition").value,ci=$("customItems").value,dep=$("department").value,ag=$("agendamentoStatus").value,cs=$("chamadoStatus").value,m=$("month").value,q=norm($("search").value).toLowerCase(),ds=getSelectedDocStatuses();
@@ -285,7 +289,7 @@ function render(){
  $("pillarCards").innerHTML=Object.entries(COLORS).map(([p,c])=>`<div class="pillar"><div class="pillar-top"><span>${p}</span><span>${fmtInt(pcs[p]||0)} pedidos</span></div><div class="pillar-metrics">${fmtInt(punits[p]||0)} unidades</div><div class="bar"><div class="fill" style="width:${((pcs[p]||0)/max)*100}%;background:${c}"></div></div></div>`).join("");
  $("countRows").textContent=fmtInt(filtered.length)+" registros";
  const detailRows=[...filtered].sort((a,b)=>{const sa=slaDays(a),sb=slaDays(b);if(sa===null&&sb===null)return 0;if(sa===null)return 1;if(sb===null)return -1;return sb-sa});
- $("tbody").innerHTML=detailRows.slice(0,1000).map(r=>`<tr><td>${escapeHtml(r["Ordem de venda"])}</td><td>${escapeHtml(r.Nome)}</td><td><span class="pillar-cell ${norm(r.PILAR).replace(/[^A-Za-z]/g,"")}">${escapeHtml(r.PILAR)}</span></td><td>${escapeHtml(r.CANAL)}</td><td class="status ${norm(r["STATUS FINAL"])}">${escapeHtml(r["STATUS FINAL"])}</td><td>${fmtInt(r.Quantidade)}</td><td>${escapeHtml(safeDateLabel(r.DATA_DETALHAMENTO))}</td><td>${slaHtml(r)}</td><td>${escapeHtml(r["ÁREA"])}</td><td>${escapeHtml(r.Estado)}</td><td>${escapeHtml(r.AGENDAMENTO_STATUS||"—")}</td><td>${escapeHtml(r.CHAMADO_TIPO||"—")}</td><td>${observationHtml(r)}</td></tr>`).join("")||'<tr><td colspan="13" class="empty">Sem dados para o filtro selecionado.</td></tr>';
+ $("tbody").innerHTML=detailRows.slice(0,1000).map(r=>`<tr><td>${escapeHtml(r["Ordem de venda"])}</td><td>${escapeHtml(r.Nome)}</td><td><span class="pillar-cell ${norm(r.PILAR).replace(/[^A-Za-z]/g,"")}">${escapeHtml(r.PILAR)}</span></td><td>${escapeHtml(r.CANAL)}</td><td class="status ${norm(r["STATUS FINAL"])}">${escapeHtml(r["STATUS FINAL"])}</td><td>${fmtInt(r.Quantidade)}</td><td>${escapeHtml(safeDateLabel(r.DATA_DETALHAMENTO))}</td><td>${slaHtml(r)}</td><td>${escapeHtml(r["ÁREA"])}</td><td>${escapeHtml(r.Estado)}</td><td>${escapeHtml(r.AGENDAMENTO_STATUS||"—")}</td><td>${escapeHtml(r.CHAMADO_TIPO||"—")}</td><td class="observation-cell">${observationHtml(r)}</td></tr>`).join("")||'<tr><td colspan="13" class="empty">Sem dados para o filtro selecionado.</td></tr>';
   renderCarrierTable(filtered);renderTickets();
 }
 function renderCarrierTable(rows){
