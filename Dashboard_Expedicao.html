@@ -55,8 +55,8 @@ table{border-collapse:collapse;width:100%;font-size:12px}th,td{padding:10px 12px
 
 /* Ajustes visuais solicitados: chips e card de observação no padrão operacional. */
 .ticket-tag{display:inline-block;padding:6px 10px;border-radius:7px;font-weight:800;max-width:300px;white-space:normal;line-height:1.4;border:1px solid transparent}
-.ticket-tag-type{background:rgba(148,68,252,.16);border-color:rgba(148,68,252,.34);color:var(--text)}
-.ticket-tag-channel{background:rgba(4,196,252,.13);border-color:rgba(4,196,252,.32);color:var(--text)}
+.ticket-tag-type{background:#9444FC;border-color:#9444FC;color:#fff}
+.ticket-tag-channel{background:#04C4FC;border-color:#04C4FC;color:#081923}
 .observation{display:inline-flex;align-items:center;gap:7px;border-bottom:none;color:var(--text);font-weight:500;max-width:260px;cursor:help}
 .observation-indicator{width:16px;height:16px;display:grid;place-items:center;border:1px solid var(--accent);border-radius:5px;color:var(--accent);font-size:11px;line-height:1;flex-shrink:0}
 .observation-preview{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:230px}
@@ -69,7 +69,9 @@ table{border-collapse:collapse;width:100%;font-size:12px}th,td{padding:10px 12px
 /* Ajustes pontuais: centralização do indicador e destaques na tabela de chamados. */
 .observation-cell{text-align:center}
 .observation{justify-content:center}
-.ticket-tag-ov{background:rgba(4,100,252,.14);border-color:rgba(4,100,252,.32);color:var(--text)}
+.ticket-tag-ov{background:#0464FC;border-color:#0464FC;color:#fff}
+.ticket-state{display:inline-block;padding:6px 10px;border-radius:7px;font-weight:800;background:var(--bg);border:1px solid var(--border)}
+.ticket-state-pending{color:#dc2626}.ticket-state-closed{color:#16a34a}
 </style>
 </head>
 <body>
@@ -99,6 +101,7 @@ table{border-collapse:collapse;width:100%;font-size:12px}th,td{padding:10px 12px
   </div>
   <select class="select" id="agendamentoStatus"><option value="">Todos os status de agendamento</option></select>
   <select class="select" id="chamadoStatus"><option value="">Todos os status chamado</option></select>
+  <select class="select" id="consideracaoChamado"><option value="">Consideração do chamado · Todos</option><option value="Pendente">Pendente</option><option value="Encerrado">Encerrado</option></select>
   <select class="select" id="month"><option value="">Todos os meses</option></select>
   <input class="select" id="search" placeholder="Buscar OV, cliente, série...">
 </div>
@@ -138,8 +141,13 @@ table{border-collapse:collapse;width:100%;font-size:12px}th,td{padding:10px 12px
 
   <div class="card table-card" style="margin-top:16px;margin-bottom:16px" id="ticketsPanel">
     <div class="table-head"><div><div class="chart-title" style="margin:0">Chamados pendentes · SLA de atendimento</div><div class="chart-sub" style="margin:3px 0 0">Análise do fluxo de chamados • pendências e SLA de atendimento</div></div><div id="ticketsCount" class="subtitle"></div></div>
-    <div class="table-wrap ticket-table"><table><thead><tr><th>ID</th><th>Ordem de venda</th><th>Criado por</th><th>Solicitante</th><th>Data criada</th><th>Tipo de solicitação</th><th>Canal de venda</th><th>SLA (dias)</th></tr></thead><tbody id="ticketsBody"></tbody></table></div>
+    <div class="table-wrap ticket-table"><table><thead><tr><th>ID</th><th>Consideração</th><th>Ordem de venda</th><th>Criado por</th><th>Solicitante</th><th>Data criada</th><th>Tipo de solicitação</th><th>Canal de venda</th><th>SLA (dias)</th><th>SLA (horas)</th></tr></thead><tbody id="ticketsBody"></tbody></table></div>
   </div>
+<div class="card chart-card" style="margin-bottom:16px" id="ticketChannelsPanel">
+  <div class="chart-title">Chamados por canal de venda</div>
+  <div class="chart-sub">Distribuição dos chamados por canal de venda · coluna R</div>
+  <div class="pillars" id="ticketChannelCards"></div>
+</div>
 <div class="card table-card" style="margin-top:16px">
   <div class="table-head"><div><div class="chart-title" style="margin:0">Transportadoras</div><div class="chart-sub" style="margin:3px 0 0">Pedidos únicos pela coluna B e quantidade total pela coluna K, conforme os filtros aplicados</div></div><div id="countCarriers" class="subtitle"></div></div>
   <div class="table-wrap"><table><thead><tr><th>Transportadora</th><th>Pedidos únicos</th><th>Quantidade total</th></tr></thead><tbody id="carrierBody"></tbody></table></div>
@@ -221,13 +229,34 @@ document.addEventListener("focusout",e=>{if(e.target.closest?.(".observation"))h
 document.addEventListener("scroll",hideObservation,true);
 window.addEventListener("resize",hideObservation);
 
+function ticketConsideration(r){const v=norm(r.pendente).toLocaleLowerCase("pt-BR");if(v==="não"||v==="nao")return "Pendente";if(v==="sim")return "Encerrado";return ""}
 function ticketAge(r){const d=parseDate(r.criada);if(!d)return null;const today=new Date();today.setHours(0,0,0,0);d.setHours(0,0,0,0);return Math.max(0,Math.floor((today-d)/86400000))}
-function renderTickets(){const allowed=new Set(filtered.map(r=>orderKey(r["Ordem de venda"])).filter(Boolean));const s=$("chamadoStatus").value;const tickets=CHAMADOS.filter(r=>norm(r.pendente).toLowerCase()==="não"||norm(r.pendente).toLowerCase()==="nao").filter(r=>(!s||norm(r.tipo)===s)&&(!r.ov||allowed.has(orderKey(r.ov))));tickets.sort((a,b)=>(ticketAge(b)??-1)-(ticketAge(a)??-1));$("ticketsCount").textContent=fmtInt(tickets.length)+" chamados pendentes";$("ticketsBody").innerHTML=tickets.map(r=>`<tr><td>${escapeHtml(r.id)}</td><td><span class="ticket-tag ticket-tag-ov">${escapeHtml(r.ov||"—")}</span></td><td>${escapeHtml(r.criado_por)}</td><td>${escapeHtml(r.solicitante)}</td><td>${escapeHtml(safeDateLabel(r.criada))}</td><td><span class="ticket-tag ticket-tag-type">${escapeHtml(r.tipo)}</span></td><td><span class="ticket-tag ticket-tag-channel">${escapeHtml(r.canal)}</span></td><td class="ticket-age">${ticketAge(r)===null?"—":fmtInt(ticketAge(r))}</td></tr>`).join("")||'<tr><td colspan="8" class="empty">Nenhum chamado pendente encontrado.</td></tr>'}
+function ticketHours(r){if(ticketConsideration(r)!=="Pendente")return null;const d=parseDate(r.criada);if(!d)return null;return Math.max(0,Math.floor((Date.now()-d.getTime())/3600000))}
+function ticketsForView(){
+ const allowed=new Set(filtered.map(r=>orderKey(r["Ordem de venda"])).filter(Boolean));
+ const s=$("chamadoStatus").value,consideration=$("consideracaoChamado").value;
+ return CHAMADOS.filter(r=>(!s||norm(r.tipo)===s)&&(!r.ov||allowed.has(orderKey(r.ov)))&&(!consideration||ticketConsideration(r)===consideration));
+}
+function renderTicketChannels(tickets){
+ const groups=new Map();tickets.forEach(r=>{const channel=norm(r.canal)||"Sem canal";if(!groups.has(channel))groups.set(channel,{total:0,pending:0,closed:0});const g=groups.get(channel);g.total++;if(ticketConsideration(r)==="Pendente")g.pending++;if(ticketConsideration(r)==="Encerrado")g.closed++});
+ const vals=[...groups.entries()].sort((a,b)=>b[1].total-a[1].total||a[0].localeCompare(b[0],"pt-BR"));const max=Math.max(1,...vals.map(x=>x[1].total));
+ const colors=["#0464FC","#04C4FC","#9444FC","#D404BC","#060608"];
+ $("ticketChannelCards").innerHTML=vals.map(([channel,g],i)=>`<div class="pillar"><div class="pillar-top"><span>${escapeHtml(channel)}</span><span>${fmtInt(g.total)} chamados</span></div><div class="pillar-metrics">${fmtInt(g.pending)} pendentes · ${fmtInt(g.closed)} encerrados</div><div class="bar"><div class="fill" style="width:${g.total/max*100}%;background:${colors[i%colors.length]}"></div></div></div>`).join("")||'<div class="empty">Nenhum chamado encontrado.</div>';
+}
+function renderTickets(){
+ const consideration=$("consideracaoChamado").value;
+ const tickets=ticketsForView().filter(r=>consideration?ticketConsideration(r)===consideration:ticketConsideration(r)==="Pendente");
+ tickets.sort((a,b)=>(ticketAge(b)??-1)-(ticketAge(a)??-1));
+ $("ticketsCount").textContent=fmtInt(tickets.length)+(consideration==="Encerrado"?" chamados encerrados":" chamados pendentes");
+ $("ticketsBody").innerHTML=tickets.map(r=>`<tr><td>${escapeHtml(r.id)}</td><td><span class="ticket-state ${ticketConsideration(r)==="Pendente"?"ticket-state-pending":"ticket-state-closed"}">${ticketConsideration(r)}</span></td><td><span class="ticket-tag ticket-tag-ov">${escapeHtml(r.ov||"—")}</span></td><td>${escapeHtml(r.criado_por)}</td><td>${escapeHtml(r.solicitante)}</td><td>${escapeHtml(safeDateLabel(r.criada))}</td><td><span class="ticket-tag ticket-tag-type">${escapeHtml(r.tipo)}</span></td><td><span class="ticket-tag ticket-tag-channel">${escapeHtml(r.canal)}</span></td><td class="ticket-age">${ticketConsideration(r)==="Pendente"&&ticketAge(r)!==null?fmtInt(ticketAge(r)):"—"}</td><td class="ticket-age">${ticketHours(r)===null?"—":fmtInt(ticketHours(r))}</td></tr>`).join("")||'<tr><td colspan="10" class="empty">Nenhum chamado encontrado para os filtros selecionados.</td></tr>';
+ renderTicketChannels(ticketsForView());
+}
 let filtered=DATA, charts={};
 function getFiltered(){
- const t=$("orderType").value,s=$("status").value,c=$("channel").value,a=$("area").value,dc=$("deliveryCondition").value,ci=$("customItems").value,dep=$("department").value,ag=$("agendamentoStatus").value,cs=$("chamadoStatus").value,m=$("month").value,q=norm($("search").value).toLowerCase(),ds=getSelectedDocStatuses();
+ const t=$("orderType").value,s=$("status").value,c=$("channel").value,a=$("area").value,dc=$("deliveryCondition").value,ci=$("customItems").value,dep=$("department").value,ag=$("agendamentoStatus").value,cs=$("chamadoStatus").value,consideration=$("consideracaoChamado").value,m=$("month").value,q=norm($("search").value).toLowerCase(),ds=getSelectedDocStatuses();
+ const consideredOVs=consideration?new Set(CHAMADOS.filter(ch=>ticketConsideration(ch)===consideration).map(ch=>orderKey(ch.ov)).filter(Boolean)):null;
  return DATA.filter(r=>
-   (!t||norm(r.TIPO_ORDEM)===t)&&(!s||norm(r["STATUS FINAL"])===s)&&(!c||norm(r.CANAL)===c)&&(!a||norm(r["ÁREA"])===a)&&(!dc||norm(r["Condições de entrega"])===dc)&&(!ci||norm(r["Possui Itens Customizados"])===ci)&&(!dep||norm(r["DEPARTAMENTO"])===dep)&&(!ag||splitValues(extraStatus(r,"AGENDAMENTO_STATUS")).includes(ag))&&(!cs||splitValues(extraStatus(r,"CHAMADO_TIPO")).includes(cs))&&(!m||norm(r.MES_FILTRO)===m)&&(ds.length===0||ds.includes(norm(r["Status do documento"])))&&
+   (!t||norm(r.TIPO_ORDEM)===t)&&(!s||norm(r["STATUS FINAL"])===s)&&(!c||norm(r.CANAL)===c)&&(!a||norm(r["ÁREA"])===a)&&(!dc||norm(r["Condições de entrega"])===dc)&&(!ci||norm(r["Possui Itens Customizados"])===ci)&&(!dep||norm(r["DEPARTAMENTO"])===dep)&&(!ag||splitValues(extraStatus(r,"AGENDAMENTO_STATUS")).includes(ag))&&(!cs||splitValues(extraStatus(r,"CHAMADO_TIPO")).includes(cs))&&(!consideration||consideredOVs.has(orderKey(r["Ordem de venda"])))&&(!m||norm(r.MES_FILTRO)===m)&&(ds.length===0||ds.includes(norm(r["Status do documento"])))&&
    (!q||[r["Ordem de venda"],r.Nome,r["Número de Série do Equipamento"],r["Referência de cliente"]].some(x=>norm(x).toLowerCase().includes(q)))
  )
 }
@@ -372,7 +401,7 @@ function initializeControls(){
  fillMultiValueSelect("agendamentoStatus","AGENDAMENTO_STATUS","Todos os status de agendamento");fillMultiValueSelect("chamadoStatus","CHAMADO_TIPO","Todos os status chamado");
  rebuildMonthOptions();
  setupDocStatusFilter();
- ["orderType","status","channel","area","deliveryCondition","customItems","department","agendamentoStatus","chamadoStatus","month"].forEach(id=>$(id).addEventListener("change",render));
+ ["orderType","status","channel","area","deliveryCondition","customItems","department","agendamentoStatus","chamadoStatus","consideracaoChamado","month"].forEach(id=>$(id).addEventListener("change",render));
  $("search").addEventListener("input",render);
  $("themeBtn").addEventListener("click",()=>{let dark=document.body.dataset.theme==="dark";document.body.dataset.theme=dark?"":"dark";$("themeBtn").textContent=dark?"☾ Tema escuro":"☀ Tema claro";render();});
  window.addEventListener("resize",render);
