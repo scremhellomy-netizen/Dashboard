@@ -71,7 +71,10 @@ table{border-collapse:collapse;width:100%;font-size:12px}th,td{padding:10px 12px
 .observation{justify-content:center}
 .ticket-tag-ov{background:#0464FC;border-color:#0464FC;color:#fff}
 .ticket-state{display:inline-block;padding:6px 10px;border-radius:7px;font-weight:800;background:var(--bg);border:1px solid var(--border)}
-.ticket-state-pending{color:#dc2626}.ticket-state-closed{color:#16a34a}
+.ticket-state-pending{color:#065f46;background:#d1fae5;border-color:#a7f3d0}.ticket-state-closed{color:#16a34a}
+.ticket-summary{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-bottom:12px}
+.ticket-summary .pillar{padding:18px;border-width:2px}.ticket-summary .pillar-top{font-size:14px}.ticket-summary .pillar-metrics{font-size:12px}
+@media(max-width:600px){.ticket-summary{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -99,8 +102,20 @@ table{border-collapse:collapse;width:100%;font-size:12px}th,td{padding:10px 12px
       <div id="docStatusOptions"></div>
     </div>
   </div>
-  <select class="select" id="agendamentoStatus"><option value="">Todos os status de agendamento</option></select>
-  <select class="select" id="chamadoStatus"><option value="">Todos os status chamado</option></select>
+  <div class="multi-select" id="agendamentoStatusFilter">
+    <button type="button" class="multi-btn" id="agendamentoStatusBtn">Todos os status de agendamento</button>
+    <div class="multi-menu" id="agendamentoStatusMenu">
+      <div class="multi-actions"><button type="button" id="agendamentoSelectAll">Selecionar todos</button><button type="button" id="agendamentoClearAll">Limpar</button></div>
+      <div id="agendamentoStatusOptions"></div>
+    </div>
+  </div>
+  <div class="multi-select" id="chamadoStatusFilter">
+    <button type="button" class="multi-btn" id="chamadoStatusBtn">Todos os status chamado</button>
+    <div class="multi-menu" id="chamadoStatusMenu">
+      <div class="multi-actions"><button type="button" id="chamadoSelectAll">Selecionar todos</button><button type="button" id="chamadoClearAll">Limpar</button></div>
+      <div id="chamadoStatusOptions"></div>
+    </div>
+  </div>
   <select class="select" id="consideracaoChamado"><option value="">Consideração do chamado · Todos</option><option value="Pendente">Pendente</option><option value="Encerrado">Encerrado</option></select>
   <select class="select" id="month"><option value="">Todos os meses</option></select>
   <input class="select" id="search" placeholder="Buscar OV, cliente, série...">
@@ -146,6 +161,7 @@ table{border-collapse:collapse;width:100%;font-size:12px}th,td{padding:10px 12px
 <div class="card chart-card" style="margin-bottom:16px" id="ticketChannelsPanel">
   <div class="chart-title">Chamados por canal de venda</div>
   <div class="chart-sub">Distribuição dos chamados por canal de venda · coluna R</div>
+  <div class="ticket-summary" id="ticketSummaryCards"></div>
   <div class="pillars" id="ticketChannelCards"></div>
 </div>
 <div class="card table-card" style="margin-top:16px">
@@ -213,6 +229,23 @@ function setupDocStatusFilter(){
 function getSelectedDocStatuses(){return [...document.querySelectorAll("input[data-doc-status]:checked")].map(x=>x.value)}
 function updateDocStatusButton(){const vals=getSelectedDocStatuses();$("docStatusBtn").textContent=vals.length?`${vals.length} status selecionado${vals.length>1?"s":""}`:"Todos os status do documento";}
 
+// Mesmo padrão visual e de seleção múltipla do status do documento.
+function setupExtraStatusFilter(prefix,field,label){
+ const filter=$(prefix+"StatusFilter"),btn=$(prefix+"StatusBtn"),box=$(prefix+"StatusOptions");
+ btn.addEventListener("click",e=>{e.stopPropagation();filter.classList.toggle("open");});
+ document.addEventListener("click",e=>{if(!filter.contains(e.target))filter.classList.remove("open")});
+ $(prefix+"SelectAll").addEventListener("click",()=>{box.querySelectorAll('input[type="checkbox"]').forEach(x=>x.checked=true);updateExtraStatusButton(prefix,label);render()});
+ $(prefix+"ClearAll").addEventListener("click",()=>{box.querySelectorAll('input[type="checkbox"]').forEach(x=>x.checked=false);updateExtraStatusButton(prefix,label);render()});
+}
+function selectedExtraStatuses(prefix){return [...$(prefix+"StatusOptions").querySelectorAll('input[type="checkbox"]:checked')].map(x=>x.value)}
+function updateExtraStatusButton(prefix,label){const n=selectedExtraStatuses(prefix).length;$(prefix+"StatusBtn").textContent=n?`${n} status selecionado${n>1?"s":""}`:label}
+function fillExtraStatusFilter(prefix,col,label){
+ const box=$(prefix+"StatusOptions"),selected=new Set(selectedExtraStatuses(prefix));
+ const vals=[...new Set(DATA.flatMap(r=>splitValues(r[col])))].sort((a,b)=>a.localeCompare(b,"pt-BR"));
+ box.innerHTML=vals.map(v=>`<label class="multi-option"><input type="checkbox" value="${escapeHtml(v)}" ${selected.has(v)?"checked":""}> <span>${escapeHtml(v)}</span></label>`).join("");
+ box.querySelectorAll('input[type="checkbox"]').forEach(el=>el.addEventListener("change",()=>{updateExtraStatusButton(prefix,label);render()}));
+ updateExtraStatusButton(prefix,label);
+}
 function orderKey(v){return norm(v).toUpperCase().replace(/\s+/g,"")}
 function extraStatus(r,key){return norm(r[key])}
 function splitValues(v){return norm(v).split(" | ").map(x=>x.trim()).filter(Boolean)}
@@ -234,29 +267,32 @@ function ticketAge(r){const d=parseDate(r.criada);if(!d)return null;const today=
 function ticketHours(r){if(ticketConsideration(r)!=="Pendente")return null;const d=parseDate(r.criada);if(!d)return null;return Math.max(0,Math.floor((Date.now()-d.getTime())/3600000))}
 function ticketsForView(){
  const allowed=new Set(filtered.map(r=>orderKey(r["Ordem de venda"])).filter(Boolean));
- const s=$("chamadoStatus").value,consideration=$("consideracaoChamado").value;
- return CHAMADOS.filter(r=>(!s||norm(r.tipo)===s)&&(!r.ov||allowed.has(orderKey(r.ov)))&&(!consideration||ticketConsideration(r)===consideration));
+ const statuses=selectedExtraStatuses("chamado"),consideration=$("consideracaoChamado").value;
+ return CHAMADOS.filter(r=>(!statuses.length||statuses.includes(norm(r.tipo)))&&(!r.ov||allowed.has(orderKey(r.ov)))&&(!consideration||ticketConsideration(r)===consideration));
 }
 function renderTicketChannels(tickets){
  const groups=new Map();tickets.forEach(r=>{const channel=norm(r.canal)||"Sem canal";if(!groups.has(channel))groups.set(channel,{total:0,pending:0,closed:0});const g=groups.get(channel);g.total++;if(ticketConsideration(r)==="Pendente")g.pending++;if(ticketConsideration(r)==="Encerrado")g.closed++});
  const vals=[...groups.entries()].sort((a,b)=>b[1].total-a[1].total||a[0].localeCompare(b[0],"pt-BR"));const max=Math.max(1,...vals.map(x=>x[1].total));
  const colors=["#0464FC","#04C4FC","#9444FC","#D404BC","#060608"];
+ const pending=tickets.filter(r=>ticketConsideration(r)==="Pendente").length;
+ const closed=tickets.filter(r=>ticketConsideration(r)==="Encerrado").length;
+ $("ticketSummaryCards").innerHTML=`<div class="pillar" style="border-color:#a7f3d0"><div class="pillar-top"><span>Pendentes</span><span>${fmtInt(pending)} chamados</span></div><div class="pillar-metrics">Chamados em aberto</div><div class="bar"><div class="fill" style="width:${tickets.length?pending/tickets.length*100:0}%;background:#059669"></div></div></div><div class="pillar" style="border-color:#04C4FC"><div class="pillar-top"><span>Encerrados</span><span>${fmtInt(closed)} chamados</span></div><div class="pillar-metrics">Chamados finalizados</div><div class="bar"><div class="fill" style="width:${tickets.length?closed/tickets.length*100:0}%;background:#04C4FC"></div></div></div>`;
  $("ticketChannelCards").innerHTML=vals.map(([channel,g],i)=>`<div class="pillar"><div class="pillar-top"><span>${escapeHtml(channel)}</span><span>${fmtInt(g.total)} chamados</span></div><div class="pillar-metrics">${fmtInt(g.pending)} pendentes · ${fmtInt(g.closed)} encerrados</div><div class="bar"><div class="fill" style="width:${g.total/max*100}%;background:${colors[i%colors.length]}"></div></div></div>`).join("")||'<div class="empty">Nenhum chamado encontrado.</div>';
 }
 function renderTickets(){
  const consideration=$("consideracaoChamado").value;
  const tickets=ticketsForView().filter(r=>consideration?ticketConsideration(r)===consideration:ticketConsideration(r)==="Pendente");
- tickets.sort((a,b)=>(ticketAge(b)??-1)-(ticketAge(a)??-1));
+ tickets.sort((a,b)=>(ticketAge(a)??Infinity)-(ticketAge(b)??Infinity));
  $("ticketsCount").textContent=fmtInt(tickets.length)+(consideration==="Encerrado"?" chamados encerrados":" chamados pendentes");
  $("ticketsBody").innerHTML=tickets.map(r=>`<tr><td>${escapeHtml(r.id)}</td><td><span class="ticket-state ${ticketConsideration(r)==="Pendente"?"ticket-state-pending":"ticket-state-closed"}">${ticketConsideration(r)}</span></td><td><span class="ticket-tag ticket-tag-ov">${escapeHtml(r.ov||"—")}</span></td><td>${escapeHtml(r.criado_por)}</td><td>${escapeHtml(r.solicitante)}</td><td>${escapeHtml(safeDateLabel(r.criada))}</td><td><span class="ticket-tag ticket-tag-type">${escapeHtml(r.tipo)}</span></td><td><span class="ticket-tag ticket-tag-channel">${escapeHtml(r.canal)}</span></td><td class="ticket-age">${ticketConsideration(r)==="Pendente"&&ticketAge(r)!==null?fmtInt(ticketAge(r)):"—"}</td><td class="ticket-age">${ticketHours(r)===null?"—":fmtInt(ticketHours(r))}</td></tr>`).join("")||'<tr><td colspan="10" class="empty">Nenhum chamado encontrado para os filtros selecionados.</td></tr>';
  renderTicketChannels(ticketsForView());
 }
 let filtered=DATA, charts={};
 function getFiltered(){
- const t=$("orderType").value,s=$("status").value,c=$("channel").value,a=$("area").value,dc=$("deliveryCondition").value,ci=$("customItems").value,dep=$("department").value,ag=$("agendamentoStatus").value,cs=$("chamadoStatus").value,consideration=$("consideracaoChamado").value,m=$("month").value,q=norm($("search").value).toLowerCase(),ds=getSelectedDocStatuses();
+ const t=$("orderType").value,s=$("status").value,c=$("channel").value,a=$("area").value,dc=$("deliveryCondition").value,ci=$("customItems").value,dep=$("department").value,ag=selectedExtraStatuses("agendamento"),cs=selectedExtraStatuses("chamado"),consideration=$("consideracaoChamado").value,m=$("month").value,q=norm($("search").value).toLowerCase(),ds=getSelectedDocStatuses();
  const consideredOVs=consideration?new Set(CHAMADOS.filter(ch=>ticketConsideration(ch)===consideration).map(ch=>orderKey(ch.ov)).filter(Boolean)):null;
  return DATA.filter(r=>
-   (!t||norm(r.TIPO_ORDEM)===t)&&(!s||norm(r["STATUS FINAL"])===s)&&(!c||norm(r.CANAL)===c)&&(!a||norm(r["ÁREA"])===a)&&(!dc||norm(r["Condições de entrega"])===dc)&&(!ci||norm(r["Possui Itens Customizados"])===ci)&&(!dep||norm(r["DEPARTAMENTO"])===dep)&&(!ag||splitValues(extraStatus(r,"AGENDAMENTO_STATUS")).includes(ag))&&(!cs||splitValues(extraStatus(r,"CHAMADO_TIPO")).includes(cs))&&(!consideration||consideredOVs.has(orderKey(r["Ordem de venda"])))&&(!m||norm(r.MES_FILTRO)===m)&&(ds.length===0||ds.includes(norm(r["Status do documento"])))&&
+   (!t||norm(r.TIPO_ORDEM)===t)&&(!s||norm(r["STATUS FINAL"])===s)&&(!c||norm(r.CANAL)===c)&&(!a||norm(r["ÁREA"])===a)&&(!dc||norm(r["Condições de entrega"])===dc)&&(!ci||norm(r["Possui Itens Customizados"])===ci)&&(!dep||norm(r["DEPARTAMENTO"])===dep)&&(!ag.length||ag.some(v=>splitValues(extraStatus(r,"AGENDAMENTO_STATUS")).includes(v)))&&(!cs.length||cs.some(v=>splitValues(extraStatus(r,"CHAMADO_TIPO")).includes(v)))&&(!consideration||consideredOVs.has(orderKey(r["Ordem de venda"])))&&(!m||norm(r.MES_FILTRO)===m)&&(ds.length===0||ds.includes(norm(r["Status do documento"])))&&
    (!q||[r["Ordem de venda"],r.Nome,r["Número de Série do Equipamento"],r["Referência de cliente"]].some(x=>norm(x).toLowerCase().includes(q)))
  )
 }
@@ -377,8 +413,8 @@ async function fetchDashboardData(){
   fillSelect("deliveryCondition","Condições de entrega","Todas as condições de entrega");
   fillSelect("customItems","Possui Itens Customizados","Todos os itens customizados");
    fillSelect("department","DEPARTAMENTO","Todos os departamentos");
-   fillMultiValueSelect("agendamentoStatus","AGENDAMENTO_STATUS","Todos os status de agendamento");
-   fillMultiValueSelect("chamadoStatus","CHAMADO_TIPO","Todos os status chamado");
+   fillExtraStatusFilter("agendamento","AGENDAMENTO_STATUS","Todos os status de agendamento");
+   fillExtraStatusFilter("chamado","CHAMADO_TIPO","Todos os status chamado");
   const box=$("docStatusOptions");
   box.innerHTML=unique("Status do documento").map(v=>`<label class="multi-option"><input type="checkbox" value="${escapeHtml(v)}" data-doc-status> <span>${escapeHtml(v)}</span></label>`).join("");
   box.querySelectorAll("input[data-doc-status]").forEach(el=>el.addEventListener("change",()=>{updateDocStatusButton();render()}));
@@ -398,10 +434,12 @@ function initializeControls(){
  fillSelect("status","STATUS FINAL","Todos os status");
  fillSelect("channel","CANAL","Todos os canais");
  fillSelect("area","ÁREA","Todas as áreas");fillSelect("deliveryCondition","Condições de entrega","Todas as condições de entrega");fillSelect("customItems","Possui Itens Customizados","Todos os itens customizados");fillSelect("department","DEPARTAMENTO","Todos os departamentos");
- fillMultiValueSelect("agendamentoStatus","AGENDAMENTO_STATUS","Todos os status de agendamento");fillMultiValueSelect("chamadoStatus","CHAMADO_TIPO","Todos os status chamado");
+ fillExtraStatusFilter("agendamento","AGENDAMENTO_STATUS","Todos os status de agendamento");fillExtraStatusFilter("chamado","CHAMADO_TIPO","Todos os status chamado");
  rebuildMonthOptions();
  setupDocStatusFilter();
- ["orderType","status","channel","area","deliveryCondition","customItems","department","agendamentoStatus","chamadoStatus","consideracaoChamado","month"].forEach(id=>$(id).addEventListener("change",render));
+ setupExtraStatusFilter("agendamento","AGENDAMENTO_STATUS","Todos os status de agendamento");
+ setupExtraStatusFilter("chamado","CHAMADO_TIPO","Todos os status chamado");
+ ["orderType","status","channel","area","deliveryCondition","customItems","department","consideracaoChamado","month"].forEach(id=>$(id).addEventListener("change",render));
  $("search").addEventListener("input",render);
  $("themeBtn").addEventListener("click",()=>{let dark=document.body.dataset.theme==="dark";document.body.dataset.theme=dark?"":"dark";$("themeBtn").textContent=dark?"☾ Tema escuro":"☀ Tema claro";render();});
  window.addEventListener("resize",render);
