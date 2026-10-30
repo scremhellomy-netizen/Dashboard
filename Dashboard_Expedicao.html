@@ -104,7 +104,7 @@ table{border-collapse:collapse;width:100%;font-size:12px}th,td{padding:10px 12px
 @media(max-width:700px){#exStoryFilters{grid-template-columns:minmax(0,1fr)}}
 </style>
 </head>
-<body>
+<body data-theme="dark">
 <aside class="ex-sidebar" id="exSidebar" aria-label="Menu lateral">
  <div class="ex-sidebrand"><div class="logo">EX</div><span>Expedição</span></div>
  <button type="button" class="ex-sideitem active" id="exNavOverview"><span class="ex-ico">▦</span><span class="ex-label">Visão operacional</span></button>
@@ -526,7 +526,8 @@ function initializeControls(){
  setupExtraStatusFilter("chamado","CHAMADO_TIPO","Todos os status chamado");
  ["orderType","status","channel","area","deliveryCondition","customItems","department","consideracaoChamado","month"].forEach(id=>$(id).addEventListener("change",render));
  $("search").addEventListener("input",render);
- $("themeBtn").addEventListener("click",()=>{let dark=document.body.dataset.theme==="dark";document.body.dataset.theme=dark?"":"dark";$("themeBtn").textContent=dark?"☾ Tema escuro":"☀ Tema claro";render();});
+ $("themeBtn").addEventListener("click",()=>{const dark=document.body.dataset.theme==="dark";document.body.dataset.theme=dark?"light":"dark";$("themeBtn").textContent=dark?"☾ Tema escuro":"☀ Tema claro";if(!$("exStory").hidden)exRenderStory();else render();});
+ $("themeBtn").textContent=document.body.dataset.theme==="dark"?"☀ Tema claro":"☾ Tema escuro";
  window.addEventListener("resize",()=>{if(!$("exStory").hidden)exRenderStory();else render()});
  render();
 }
