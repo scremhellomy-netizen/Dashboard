@@ -75,10 +75,22 @@ table{border-collapse:collapse;width:100%;font-size:12px}th,td{padding:10px 12px
 .ticket-summary{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-bottom:12px}
 .ticket-summary .pillar{padding:18px;border-width:2px}.ticket-summary .pillar-top{font-size:14px}.ticket-summary .pillar-metrics{font-size:12px}
 @media(max-width:600px){.ticket-summary{grid-template-columns:1fr}}
+/* Apenas menu lateral e nova área gerencial */
+.ex-sidebar{position:fixed;left:0;top:0;bottom:0;width:232px;background:var(--card);border-right:1px solid var(--border);z-index:60;display:flex;flex-direction:column;padding:18px 12px;transition:width .2s,transform .2s;box-shadow:var(--shadow)}
+.ex-sidebar .logo{flex-shrink:0}.ex-sidebrand{display:flex;align-items:center;gap:12px;padding:6px 5px 22px}.ex-sidebrand span{font-weight:800;white-space:nowrap}.ex-sideitem{width:100%;border:0;background:transparent;color:var(--text);text-align:left;display:flex;align-items:center;gap:12px;padding:13px 12px;border-radius:10px;cursor:pointer;font-weight:700;margin-bottom:7px}.ex-sideitem:hover,.ex-sideitem.active{background:rgba(4,100,252,.12);color:var(--accent)}.ex-sideitem .ex-ico{font-size:19px;width:23px;text-align:center}.ex-sideitem .ex-label{white-space:nowrap}.ex-sidebottom{margin-top:auto}.ex-toggle{position:fixed;left:243px;top:17px;z-index:65;border:1px solid var(--border);border-radius:10px;background:var(--card);color:var(--text);padding:9px 11px;cursor:pointer;transition:left .2s}.ex-shell{margin-left:232px;transition:margin-left .2s}.ex-shell>.container{max-width:1500px}.ex-collapsed .ex-sidebar{width:74px}.ex-collapsed .ex-sidebrand span,.ex-collapsed .ex-sideitem .ex-label{display:none}.ex-collapsed .ex-shell{margin-left:74px}.ex-collapsed .ex-toggle{left:85px}.ex-collapsed .ex-sideitem{justify-content:center}.ex-page[hidden]{display:none!important}.ex-story-filters{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:15px}.ex-story-filters .multi-menu{z-index:70}.ex-story-filters label{font-size:12px;color:var(--muted);font-weight:700}.ex-story-filters .multi-select{margin-top:6px}.ex-story-filters .select{width:100%;margin-top:6px}.ex-story-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:16px}.ex-story-chart{margin-bottom:16px}.ex-story-chart canvas{height:340px}.ex-story-alert{border-left:4px solid #D92D20;background:rgba(217,45,32,.08);padding:12px 14px;border-radius:9px;margin:10px 0;font-size:13px}.ex-story-ok{border-left-color:#16a34a;background:rgba(22,163,74,.07)}.ex-story-table{max-height:380px}.ex-story-legend{display:flex;flex-wrap:wrap;gap:14px;color:var(--muted);font-size:12px;margin:8px 0}.ex-story-legend b{color:var(--text)}
+@media(max-width:1000px){.ex-story-kpis{grid-template-columns:repeat(2,1fr)}.ex-story-filters{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:700px){.ex-sidebar{width:232px;transform:translateX(-100%)}.ex-shell,.ex-collapsed .ex-shell{margin-left:0}.ex-toggle,.ex-collapsed .ex-toggle{left:12px;top:10px}.ex-sidebar.ex-mobile-open{transform:translateX(0)}.ex-story-filters{grid-template-columns:1fr}.ex-story-kpis{grid-template-columns:1fr}.ex-shell>.container{padding-top:58px}}
 </style>
 </head>
 <body>
-<div class="container">
+<aside class="ex-sidebar" id="exSidebar" aria-label="Menu lateral">
+ <div class="ex-sidebrand"><div class="logo">EX</div><span>Expedição</span></div>
+ <button type="button" class="ex-sideitem active" id="exNavOverview"><span class="ex-ico">▦</span><span class="ex-label">Visão operacional</span></button>
+ <button type="button" class="ex-sideitem" id="exNavStory"><span class="ex-ico">◫</span><span class="ex-label">Storytelling gerencial</span></button>
+ <div class="ex-sidebottom"><div class="subtitle ex-label" style="padding:10px">Estoque · Fazendinha II</div></div>
+</aside>
+<button type="button" id="exToggle" class="ex-toggle" aria-label="Expandir ou recolher menu" aria-expanded="true">☰</button>
+<div class="ex-shell" id="exShell"><div class="container"><div id="exOverview" class="ex-page">
 <header>
   <div class="brand">
     <div class="logo">EX</div>
@@ -135,11 +147,11 @@ table{border-collapse:collapse;width:100%;font-size:12px}th,td{padding:10px 12px
 
 <div class="card chart-card daily-card">
   <div class="chart-title">Pedidos liberados por dia</div>
-  <div class="chart-sub">Quantidade da coluna K, agrupada pela data da coluna AG</div>
+  <div class="chart-sub">Pedidos únicos pela última data de liberação (coluna AG)</div>
   <canvas id="dailyReleased"></canvas>
   <div class="chart-title" style="margin-top:18px">Visão mensal × dia</div>
   <div class="daily-table-wrap"><table class="daily-table"><thead id="dailyHead"></thead><tbody id="dailyBody"></tbody></table></div>
-  <div class="daily-legend">Cada célula representa a quantidade total liberada naquele dia. Os meses são definidos pela coluna AG e a quantidade pela coluna K.</div>
+  <div class="daily-legend">Cada célula representa pedidos únicos atribuídos à última liberação conhecida (coluna AG).</div>
 </div>
 
 <div class="card chart-card" style="margin-bottom:16px">
@@ -169,6 +181,20 @@ table{border-collapse:collapse;width:100%;font-size:12px}th,td{padding:10px 12px
   <div class="table-wrap"><table><thead><tr><th>Transportadora</th><th>Pedidos únicos</th><th>Quantidade total</th></tr></thead><tbody id="carrierBody"></tbody></table></div>
 </div>
 
+</div><!-- /exOverview -->
+<section id="exStory" class="ex-page" hidden>
+ <header><div class="brand"><div class="logo">EX</div><div><h1>Storytelling operacional</h1><div class="subtitle">Liberações reais, produtividade e oportunidades de melhoria</div></div></div></header>
+ <div class="card chart-card" style="margin-bottom:16px">
+  <div class="chart-title">Filtros da análise gerencial</div><div class="chart-sub">Seleção múltipla independente dos filtros da visão operacional</div>
+  <div class="ex-story-filters" id="exStoryFilters"></div>
+  <button class="btn" type="button" id="exStoryClear">Limpar todos os filtros</button>
+ </div>
+ <div class="ex-story-kpis" id="exStoryKpis"></div>
+ <div class="card chart-card ex-story-chart"><div class="chart-title">Pedidos únicos liberados × média diária</div><div class="chart-sub">Última liberação conhecida por OV · média por dia útil · linha tracejada = média</div><canvas id="exStoryChart"></canvas><div class="ex-story-legend"><span>■ <b>Azul:</b> liberados</span><span>■ <b>Vermelho:</b> abaixo do limite</span><span>■ <b>Laranja:</b> dia útil sem liberação</span><span>━ <b>Ciano:</b> média diária</span></div></div>
+ <div class="card chart-card" style="margin-bottom:16px"><div class="chart-title">Narrativa gerencial e alertas</div><div id="exStoryNarrative"></div></div>
+ <div class="card table-card" style="margin-bottom:16px"><div class="table-head"><div><div class="chart-title">Detalhamento diário</div><div class="chart-sub">Dias úteis do período, inclusive dias com zero pedidos</div></div></div><div class="table-wrap ex-story-table"><table><thead><tr><th>Data</th><th>Dia</th><th>Pedidos únicos</th><th>Média</th><th>Desvio</th><th>Situação</th></tr></thead><tbody id="exStoryDailyBody"></tbody></table></div></div>
+ <div class="card chart-card" style="margin-bottom:16px"><div class="chart-title">Confiabilidade da análise de reliberações</div><div id="exStoryAudit" class="subtitle"></div></div>
+</section>
 <div id="observationFloatingCard" class="observation-floating-card" role="tooltip" hidden>
   <div class="observation-card-title">Observação operacional</div>
   <div><b>Criado por:</b> <span class="observation-created"></span></div>
@@ -176,6 +202,7 @@ table{border-collapse:collapse;width:100%;font-size:12px}th,td{padding:10px 12px
   <div class="observation-card-divider"></div>
   <div class="observation-serial"></div>
 </div>
+</div></div><!-- /container /ex-shell -->
 <script>
 let DATA = [];
 let CHAMADOS = [];
@@ -194,6 +221,7 @@ function safeFileDate(v){const d=new Date(v);return Number.isNaN(d.getTime())?""
 function dateKey(v){const d=parseDate(v);if(!d||Number.isNaN(d.getTime()))return "";return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
 function rebuildMonthOptions(){$("month").innerHTML='<option value="">Todos os meses</option>';[...new Set(DATA.map(r=>r.MES_FILTRO).filter(Boolean))].sort().forEach(k=>{let o=document.createElement("option");o.value=k;o.textContent=monthLabel(k);$("month").appendChild(o)})}
 function parseDate(v){
+ if(v instanceof Date)return Number.isNaN(v.getTime())?null:v;
  if(v===null||v===undefined||v==="")return null;
  let x=String(v).trim();
  let m=x.match(/^(\d{2})\/(\d{2})\/(\d{4})\s+(\d{2}):(\d{2})(?::(\d{2}))?$/);
@@ -309,9 +337,15 @@ function drawLineChart(rows){
  keys.forEach((k,i)=>{let x=L+(keys.length===1?cw/2:cw*i/(keys.length-1)),y=T+ch-(months[k].u/max)*ch;ctx.fillStyle="#0464FC";ctx.beginPath();ctx.arc(x,y,4,0,Math.PI*2);ctx.fill();ctx.fillStyle=getComputedStyle(document.body).getPropertyValue("--text");ctx.textAlign="center";ctx.font="bold 11px Segoe UI";ctx.fillText(fmtInt(months[k].u),x,Math.max(14,y-9));ctx.fillStyle=getComputedStyle(document.body).getPropertyValue("--muted");ctx.font="11px Segoe UI";ctx.fillText(monthLabel(k),x,h-18)});
  ctx.textAlign="left";ctx.fillStyle=getComputedStyle(document.body).getPropertyValue("--text");ctx.font="12px Segoe UI";ctx.fillText("Quantidade total de unidades",L,14);
 }
+// Última data por OV é calculada na base completa ANTES dos filtros de mês.
+// Mantém múltiplas linhas da mesma OV na última data (itens), sem contar a OV duas vezes.
+function latestReleaseRows(rows){
+ const last=new Map();rows.forEach(r=>{const ov=orderKey(r["Ordem de venda"]),d=parseDate(r.DATA_AG);if(ov&&d&&(!last.has(ov)||d>last.get(ov)))last.set(ov,d)});
+ return rows.filter(r=>{const ov=orderKey(r["Ordem de venda"]),d=parseDate(r.DATA_AG);return ov&&d&&last.has(ov)&&dateKey(d)===dateKey(last.get(ov))});
+}
+function uniqueReleasedByDay(rows){const days={};rows.forEach(r=>{const d=dateKey(r.DATA_AG),ov=orderKey(r["Ordem de venda"]);if(d&&ov)(days[d]??=new Set()).add(ov)});return Object.fromEntries(Object.entries(days).map(([d,ovs])=>[d,ovs.size]))}
 function drawDailyReleased(rows){
- const {ctx,w,h}=clearCanvas($("dailyReleased"));let days={};
- rows.forEach(r=>{const key=dateKey(r.DATA_AG);if(!key)return;days[key]=(days[key]||0)+toNumber(r.Quantidade)});
+ const {ctx,w,h}=clearCanvas($("dailyReleased"));let days=uniqueReleasedByDay(rows);
  const keys=Object.keys(days).sort();
  if(!keys.length){ctx.fillStyle="#98a2b3";ctx.fillText("Sem dados para o filtro selecionado.",20,30);drawDailyMatrix(rows);return}
  const max=Math.max(...keys.map(k=>days[k]),200,1),L=52,R=18,T=30,B=58,cw=w-L-R,ch=h-T-B;
@@ -323,11 +357,11 @@ function drawDailyReleased(rows){
  ctx.strokeStyle="#0464FC";ctx.lineWidth=2;ctx.beginPath();keys.forEach((k,i)=>{let x=L+(keys.length===1?cw/2:cw*i/(keys.length-1)),y=T+ch-(days[k]/max)*ch;if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y)});ctx.stroke();
  const step=Math.max(1,Math.ceil(keys.length/12));
  keys.forEach((k,i)=>{let x=L+(keys.length===1?cw/2:cw*i/(keys.length-1)),y=T+ch-(days[k]/max)*ch;ctx.fillStyle="#0464FC";ctx.beginPath();ctx.arc(x,y,3.5,0,Math.PI*2);ctx.fill();ctx.fillStyle=text;ctx.font=keys.length>80?"bold 8px Segoe UI":"bold 10px Segoe UI";ctx.textAlign="center";ctx.fillText(fmtInt(days[k]),x,Math.max(12,y-7));if(i%step===0||i===keys.length-1){ctx.fillStyle=muted;ctx.font="10px Segoe UI";ctx.fillText(k.slice(8),x,h-27);ctx.fillText(k.slice(5,7)+"/"+k.slice(0,4),x,h-12)}});
- ctx.textAlign="left";ctx.fillStyle=text;ctx.font="12px Segoe UI";ctx.fillText("Quantidade liberada (coluna K)",L,14);drawDailyMatrix(rows);
+ ctx.textAlign="left";ctx.fillStyle=text;ctx.font="12px Segoe UI";ctx.fillText("Pedidos únicos liberados",L,14);drawDailyMatrix(rows);
 }
 function drawDailyMatrix(rows){
  const byMonth={};
- rows.forEach(r=>{const key=dateKey(r.DATA_AG);if(!key)return;const month=key.slice(0,7),day=Number(key.slice(8,10));if(!byMonth[month])byMonth[month]={};byMonth[month][day]=(byMonth[month][day]||0)+toNumber(r.Quantidade)});
+ Object.entries(uniqueReleasedByDay(rows)).forEach(([key,count])=>{const month=key.slice(0,7),day=Number(key.slice(8,10));if(!byMonth[month])byMonth[month]={};byMonth[month][day]=count});
  const months=Object.keys(byMonth).sort();
  let head='<tr><th>Mês</th>'+Array.from({length:31},(_,i)=>`<th>${i+1}</th>`).join('')+'<th>Total</th></tr>';
  $("dailyHead").innerHTML=head;
@@ -348,7 +382,7 @@ function render(){
  $("kUnidades").textContent=fmtInt(filtered.reduce((s,r)=>s+toNumber(r.Quantidade),0));
  $("kExp").textContent=fmtInt(filtered.filter(r=>norm(r["STATUS FINAL"])==="EXPEDIDO").length);
  $("kPend").textContent=fmtInt(filtered.filter(r=>norm(r["STATUS FINAL"])==="PENDENTE").length);
- drawLineChart(filtered);drawDailyReleased(filtered);drawDonut(filtered);
+ drawLineChart(filtered);const filteredSet=new Set(filtered);drawDailyReleased(latestReleaseRows(DATA).filter(r=>filteredSet.has(r)));drawDonut(filtered);
  const pcs={},punits={};filtered.forEach(r=>{const p=norm(r.PILAR)||"Sem pilar";pcs[p]=(pcs[p]||0)+1;punits[p]=(punits[p]||0)+toNumber(r.Quantidade)});
  const max=Math.max(...Object.values(pcs),1);
  $("pillarCards").innerHTML=Object.entries(COLORS).map(([p,c])=>`<div class="pillar"><div class="pillar-top"><span>${p}</span><span>${fmtInt(pcs[p]||0)} pedidos</span></div><div class="pillar-metrics">${fmtInt(punits[p]||0)} unidades</div><div class="bar"><div class="fill" style="width:${((pcs[p]||0)/max)*100}%;background:${c}"></div></div></div>`).join("");
@@ -419,8 +453,8 @@ async function fetchDashboardData(){
   box.innerHTML=unique("Status do documento").map(v=>`<label class="multi-option"><input type="checkbox" value="${escapeHtml(v)}" data-doc-status> <span>${escapeHtml(v)}</span></label>`).join("");
   box.querySelectorAll("input[data-doc-status]").forEach(el=>el.addEventListener("change",()=>{updateDocStatusButton();render()}));
   updateDocStatusButton();
-  render();
-  setSourceStatus(`Fonte: ${DATA_FILE} • ${fmtInt(rows.length)} registros • carregamento automático`,"ok");
+   exFillFilters();render();if(!$("exStory").hidden)exRenderStory();
+   setSourceStatus(`Fonte: ${DATA_FILE} • ${fmtInt(rows.length)} registros • carregamento automático`,"ok");
  }catch(e){
   console.error(e);
   setSourceStatus("Fonte de dados: erro ao carregar — "+e.message,"err");
@@ -442,9 +476,33 @@ function initializeControls(){
  ["orderType","status","channel","area","deliveryCondition","customItems","department","consideracaoChamado","month"].forEach(id=>$(id).addEventListener("change",render));
  $("search").addEventListener("input",render);
  $("themeBtn").addEventListener("click",()=>{let dark=document.body.dataset.theme==="dark";document.body.dataset.theme=dark?"":"dark";$("themeBtn").textContent=dark?"☾ Tema escuro":"☀ Tema claro";render();});
- window.addEventListener("resize",render);
+ window.addEventListener("resize",()=>{if(!$("exStory").hidden)exRenderStory();else render()});
  render();
 }
+// ===== Storytelling gerencial: controles independentes e layout original preservado =====
+const exStoryFields=[['month','Mês','MES_FILTRO'],['pillar','Pilar','PILAR'],['channel','Canal','CANAL'],['type','Tipo de ordem','TIPO_ORDEM'],['status','Status final','STATUS FINAL']];
+const exStorySelected={};let exStoryRange='';let exStoryLimit=70;
+function exBuildFilters(){
+ const holder=$('exStoryFilters');holder.innerHTML=exStoryFields.map(([id,label])=>`<div><label>${label}</label><div class="multi-select" id="exf-${id}"><button class="multi-btn" type="button" id="exb-${id}">Todos</button><div class="multi-menu"><div class="multi-actions"><button type="button" data-action="all">Selecionar todos</button><button type="button" data-action="clear">Limpar</button></div><div id="exo-${id}"></div></div></div></div>`).join('')+`<div><label>Período</label><select class="select" id="exPeriod"><option value="">Período completo</option><option value="30">Últimos 30 dias</option><option value="60">Últimos 60 dias</option><option value="90">Últimos 90 dias</option></select></div><div><label>Alerta abaixo da média</label><select class="select" id="exThreshold"><option value="70">Abaixo de 70%</option><option value="80">Abaixo de 80%</option><option value="50">Abaixo de 50%</option></select></div>`;
+ exStoryFields.forEach(([id,label,col])=>{exStorySelected[id]=new Set();const wrap=$('exf-'+id),box=$('exo-'+id);$('exb-'+id).addEventListener('click',e=>{e.stopPropagation();document.querySelectorAll('#exStoryFilters .multi-select').forEach(x=>{if(x!==wrap)x.classList.remove('open')});wrap.classList.toggle('open')});wrap.querySelector('[data-action="all"]').addEventListener('click',()=>{box.querySelectorAll('input').forEach(x=>x.checked=true);exStoryChanged(id)});wrap.querySelector('[data-action="clear"]').addEventListener('click',()=>{box.querySelectorAll('input').forEach(x=>x.checked=false);exStoryChanged(id)})});
+ document.addEventListener('click',e=>{if(!holder.contains(e.target))holder.querySelectorAll('.multi-select').forEach(x=>x.classList.remove('open'))});
+ $('exPeriod').addEventListener('change',e=>{exStoryRange=e.target.value;exRenderStory()});$('exThreshold').addEventListener('change',e=>{exStoryLimit=Number(e.target.value);exRenderStory()});
+ $('exStoryClear').addEventListener('click',()=>{exStoryFields.forEach(([id])=>{exStorySelected[id].clear();$('exo-'+id).querySelectorAll('input').forEach(x=>x.checked=false);exStoryButton(id)});$('exPeriod').value='';$('exThreshold').value='70';exStoryRange='';exStoryLimit=70;exRenderStory()});
+}
+function exStoryChanged(id){exStorySelected[id]=new Set([...$('exo-'+id).querySelectorAll('input:checked')].map(x=>x.value));exStoryButton(id);exRenderStory()}
+function exStoryButton(id){const n=exStorySelected[id].size;$('exb-'+id).textContent=n?n+' selecionado'+(n>1?'s':''):'Todos'}
+function exFillFilters(){exStoryFields.forEach(([id,label,col])=>{const selected=exStorySelected[id];const values=[...new Set(DATA.map(r=>norm(r[col])).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pt-BR'));$('exo-'+id).innerHTML=values.map(v=>`<label class="multi-option"><input type="checkbox" value="${escapeHtml(v)}" ${selected.has(v)?'checked':''}>${escapeHtml(v)}</label>`).join('');$('exo-'+id).querySelectorAll('input').forEach(x=>x.addEventListener('change',()=>exStoryChanged(id)));exStoryButton(id)})}
+function exWeekdays(start,end){const days=[];const d=new Date(start+'T12:00:00'),last=new Date(end+'T12:00:00');for(let n=0;d<=last&&n<1100;n++,d.setDate(d.getDate()+1)){if(d.getDay()!==0&&d.getDay()!==6)days.push(dateKey(d))}return days}
+function exStoryRows(){let rows=latestReleaseRows(DATA);const allDates=rows.map(r=>dateKey(r.DATA_AG)).filter(Boolean).sort();const end=allDates.at(-1)||dateKey(new Date());if(exStoryRange){const start=new Date(end+'T12:00:00');start.setDate(start.getDate()-Number(exStoryRange)+1);rows=rows.filter(r=>dateKey(r.DATA_AG)>=dateKey(start))}return rows.filter(r=>exStoryFields.every(([id,label,col])=>!exStorySelected[id].size||exStorySelected[id].has(norm(r[col]))))}
+function exDrawStory(days,counts,avg){const canvas=$('exStoryChart'),{ctx,w,h}=clearCanvas(canvas);const css=getComputedStyle(document.body);const color=css.getPropertyValue('--text'),muted=css.getPropertyValue('--muted'),border=css.getPropertyValue('--border');ctx.clearRect(0,0,w,h);if(!days.length){ctx.fillStyle=muted;ctx.fillText('Sem datas para o período.',20,30);return}const L=46,R=14,T=26,B=53,ph=h-T-B,pw=w-L-R,max=Math.max(avg,...days.map(d=>counts[d]||0),1)*1.12;ctx.font='11px Segoe UI';ctx.fillStyle=muted;ctx.strokeStyle=border;for(let i=0;i<=4;i++){const y=T+i*ph/4;ctx.beginPath();ctx.moveTo(L,y);ctx.lineTo(w-R,y);ctx.stroke();ctx.fillText(fmtInt(max*(1-i/4)),3,y+4)}const bw=Math.max(1,Math.min(18,pw/days.length*.75)),step=Math.max(1,Math.ceil(days.length/12));days.forEach((d,i)=>{const v=counts[d]||0,x=L+(i+.5)*pw/days.length,y=T+ph-v/max*ph;ctx.fillStyle=v===0?'#F79009':v<avg*exStoryLimit/100?'#D92D20':'#0464FC';ctx.fillRect(x-bw/2,y,bw,Math.max(2,T+ph-y));if(i%step===0||i===days.length-1){ctx.fillStyle=muted;ctx.textAlign='center';ctx.font='10px Segoe UI';ctx.fillText(d.slice(8)+'/'+d.slice(5,7),x,h-19)}});const ay=T+ph-avg/max*ph;ctx.strokeStyle='#04C4FC';ctx.lineWidth=2;ctx.setLineDash([7,5]);ctx.beginPath();ctx.moveTo(L,ay);ctx.lineTo(w-R,ay);ctx.stroke();ctx.setLineDash([]);ctx.fillStyle=color;ctx.textAlign='right';ctx.font='bold 11px Segoe UI';ctx.fillText('Média: '+avg.toFixed(1).replace('.',','),w-R,Math.max(13,ay-7));ctx.textAlign='left'}
+function exRenderStory(){if(!DATA.length)return;const rows=exStoryRows(),allDates=latestReleaseRows(DATA).map(r=>dateKey(r.DATA_AG)).filter(Boolean).sort();let last=allDates.at(-1);if(!last)return;let first=allDates[0];if(exStoryRange){const d=new Date(last+'T12:00:00');d.setDate(d.getDate()-Number(exStoryRange)+1);first=dateKey(d)}else if(exStorySelected.month.size){const months=[...exStorySelected.month].sort();const m=months[0];if(/^\d{4}-\d{2}$/.test(m)){first=m+'-01';const maxMonth=months.at(-1);const endMonth=new Date(maxMonth+'-01T12:00:00');endMonth.setMonth(endMonth.getMonth()+1);endMonth.setDate(0);last=last<dateKey(endMonth)?last:dateKey(endMonth)}}const days=exWeekdays(first,last),by=uniqueReleasedByDay(rows),total=days.reduce((a,d)=>a+(by[d]||0),0),avg=days.length?total/days.length:0,zero=days.filter(d=>!by[d]),low=days.filter(d=>by[d]>0&&by[d]<avg*exStoryLimit/100);const uniq=new Set(rows.map(r=>orderKey(r['Ordem de venda']))).size;const cards=[['PEDIDOS ÚNICOS',uniq,'Última liberação conhecida'],['MÉDIA / DIA ÚTIL',avg.toFixed(1).replace('.',','),'Pedidos por dia útil'],['DIAS ÚTEIS SEM LIBERAÇÃO',zero.length,'Segunda a sexta, sem feriados'],['DIAS ABAIXO DO LIMITE',low.length,'Abaixo de '+exStoryLimit+'% da média']];$('exStoryKpis').innerHTML=cards.map(([l,v,n])=>`<div class="card kpi"><div class="kpi-label">${l}</div><div class="kpi-value">${v}</div><div class="kpi-note">${n}</div></div>`).join('');exDrawStory(days,by,avg);
+ const worst=[...days].filter(d=>by[d]>0).sort((a,b)=>by[a]-by[b]).slice(0,5);$('exStoryNarrative').innerHTML=`<div class="ex-story-alert ${zero.length?'':'ex-story-ok'}"><b>${zero.length} dias úteis sem liberação</b> no intervalo analisado. ${zero.length?'Datas: '+zero.slice(0,15).map(escapeHtml).join(', ')+(zero.length>15?'…':''): 'Não foram identificados dias úteis zerados.'}</div><div class="ex-story-alert ${low.length?'':'ex-story-ok'}"><b>${low.length} dias com desempenho abaixo de ${exStoryLimit}% da média</b> (${avg.toFixed(1).replace('.',',')} pedidos/dia útil). ${low.length?'Priorizar a análise dos dias com menor produtividade.':'Nenhum dia com atividade ficou abaixo do limite.'}</div><p class="subtitle">Menores volumes com atividade: ${worst.map(d=>escapeHtml(d)+' ('+fmtInt(by[d])+')').join(' · ')||'não disponível'}.</p><p class="subtitle">Os dias sem registros são indícios para investigação, não prova de ociosidade: feriados, ausência de carga ou falha na origem podem explicar os zeros.</p>`;
+ $('exStoryDailyBody').innerHTML=days.map(d=>{const v=by[d]||0,delta=avg?(v/avg-1)*100:0,status=v===0?'Sem liberação':v<avg*exStoryLimit/100?'Abaixo do limite':'Dentro/acima';const date=new Date(d+'T12:00:00');return `<tr><td>${d.split('-').reverse().join('/')}</td><td>${date.toLocaleDateString('pt-BR',{weekday:'long'})}</td><td><b>${fmtInt(v)}</b></td><td>${avg.toFixed(1).replace('.',',')}</td><td>${avg?(delta>0?'+':'')+delta.toFixed(1).replace('.',',')+'%':'—'}</td><td style="color:${v===0?'#F79009':status==='Abaixo do limite'?'#D92D20':'#16a34a'};font-weight:800">${status}</td></tr>`}).join('')||'<tr><td colspan="6" class="empty">Sem dias úteis no período.</td></tr>';
+ const ovCount=new Map(),ovDays=new Map();DATA.forEach(r=>{const k=orderKey(r['Ordem de venda']);if(!k)return;ovCount.set(k,(ovCount.get(k)||0)+1);const day=dateKey(r.DATA_AG);if(day){if(!ovDays.has(k))ovDays.set(k,new Set());ovDays.get(k).add(day)}});const repeated=[...ovDays.values()].filter(set=>set.size>1).length,missing=DATA.filter(r=>!dateKey(r.DATA_AG)).length;$('exStoryAudit').innerHTML=`<b>${fmtInt(repeated)} OVs</b> com liberações em datas diferentes detectadas na base atual · <b>${fmtInt(missing)} registros</b> sem data de liberação (não incluídos na série diária). A identificação histórica depende de a origem preservar os eventos anteriores. Pedidos com múltiplas linhas na mesma data são contados uma única vez.`;
+}
+function exSwitch(page){$('exOverview').hidden=page!=='overview';$('exStory').hidden=page!=='story';$('exNavOverview').classList.toggle('active',page==='overview');$('exNavStory').classList.toggle('active',page==='story');if(page==='story')exRenderStory();else render();if(innerWidth<=700)$('exSidebar').classList.remove('ex-mobile-open')}
+$('exNavOverview').addEventListener('click',()=>exSwitch('overview'));$('exNavStory').addEventListener('click',()=>exSwitch('story'));$('exToggle').addEventListener('click',()=>{if(innerWidth<=700){$('exSidebar').classList.toggle('ex-mobile-open')}else{document.body.classList.toggle('ex-collapsed');$('exToggle').setAttribute('aria-expanded',String(!document.body.classList.contains('ex-collapsed')))}setTimeout(()=>{if(!$('exStory').hidden)exRenderStory();else render()},230)});
+exBuildFilters();
 initializeControls();
 </script>
 </body>
