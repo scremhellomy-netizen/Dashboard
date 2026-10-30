@@ -100,6 +100,10 @@ table{border-collapse:collapse;width:100%;font-size:12px}th,td{padding:10px 12px
 #exStoryFilters > div{min-width:0;width:100%}
 #exStoryFilters .multi-btn,#exStoryFilters .select{display:block;width:100%;height:40px;min-height:40px;max-width:100%;box-sizing:border-box;padding:9px 12px;font:inherit;font-size:13px;line-height:20px;border-radius:10px}
 #exStoryFilters .multi-btn{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* Ajustes solicitados: menu de operações acima dos filtros vizinhos e tipografia dos controles gerenciais igual à visão operacional. */
+#operationTypeFilter.open{z-index:30}
+#exStoryFilters .multi-btn,#exStoryFilters .select{font-size:16px}
+
 @media(max-width:1000px){#exStoryFilters{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:700px){#exStoryFilters{grid-template-columns:minmax(0,1fr)}}
 </style>
