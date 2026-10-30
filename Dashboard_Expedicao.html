@@ -184,11 +184,11 @@ table{border-collapse:collapse;width:100%;font-size:12px}th,td{padding:10px 12px
 
 <div class="card chart-card daily-card">
   <div class="chart-title">Pedidos liberados por dia</div>
-  <div class="chart-sub">Pedidos únicos pela última data de liberação (coluna AG)</div>
+  <div class="chart-sub">Volumes pela última data de liberação (coluna AG)</div>
   <canvas id="dailyReleased"></canvas>
   <div class="chart-title" style="margin-top:18px">Visão mensal × dia</div>
   <div class="daily-table-wrap"><table class="daily-table"><thead id="dailyHead"></thead><tbody id="dailyBody"></tbody></table></div>
-  <div class="daily-legend">Cada célula representa pedidos únicos atribuídos à última liberação conhecida (coluna AG).</div>
+  <div class="daily-legend">Cada célula representa volumes atribuídos à última liberação conhecida (coluna AG).</div>
 </div>
 
 <div class="card chart-card" style="margin-bottom:16px">
@@ -428,8 +428,15 @@ function latestReleaseRows(rows){
  return rows.filter(r=>{const ov=orderKey(r["Ordem de venda"]),d=parseDate(r.DATA_AG);return ov&&d&&last.has(ov)&&dateKey(d)===dateKey(last.get(ov))});
 }
 function uniqueReleasedByDay(rows){const days={};rows.forEach(r=>{const d=dateKey(r.DATA_AG),ov=orderKey(r["Ordem de venda"]);if(d&&ov)(days[d]??=new Set()).add(ov)});return Object.fromEntries(Object.entries(days).map(([d,ovs])=>[d,ovs.size]))}
+// Total volumétrico por data: soma da Quantidade dos registros da última liberação de cada OV.
+// Função exclusiva da Visão operacional; o Storytelling continua usando pedidos únicos.
+function volumeReleasedByDay(rows){
+ const days={};
+ rows.forEach(r=>{const d=dateKey(r.DATA_AG);if(d)days[d]=(days[d]||0)+toNumber(r.Quantidade)});
+ return days;
+}
 function drawDailyReleased(rows){
- const {ctx,w,h}=clearCanvas($("dailyReleased"));let days=uniqueReleasedByDay(rows);
+ const {ctx,w,h}=clearCanvas($("dailyReleased"));let days=volumeReleasedByDay(rows);
  const keys=Object.keys(days).sort();
  if(!keys.length){ctx.fillStyle="#98a2b3";ctx.fillText("Sem dados para o filtro selecionado.",20,30);drawDailyMatrix(rows);return}
  const max=Math.max(...keys.map(k=>days[k]),200,1),L=52,R=18,T=30,B=58,cw=w-L-R,ch=h-T-B;
@@ -441,11 +448,11 @@ function drawDailyReleased(rows){
  ctx.strokeStyle="#0464FC";ctx.lineWidth=2;ctx.beginPath();keys.forEach((k,i)=>{let x=L+(keys.length===1?cw/2:cw*i/(keys.length-1)),y=T+ch-(days[k]/max)*ch;if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y)});ctx.stroke();
  const step=Math.max(1,Math.ceil(keys.length/12));
  keys.forEach((k,i)=>{let x=L+(keys.length===1?cw/2:cw*i/(keys.length-1)),y=T+ch-(days[k]/max)*ch;ctx.fillStyle="#0464FC";ctx.beginPath();ctx.arc(x,y,3.5,0,Math.PI*2);ctx.fill();ctx.fillStyle=text;ctx.font=keys.length>80?"bold 8px Segoe UI":"bold 10px Segoe UI";ctx.textAlign="center";ctx.fillText(fmtInt(days[k]),x,Math.max(12,y-7));if(i%step===0||i===keys.length-1){ctx.fillStyle=muted;ctx.font="10px Segoe UI";ctx.fillText(k.slice(8),x,h-27);ctx.fillText(k.slice(5,7)+"/"+k.slice(0,4),x,h-12)}});
- ctx.textAlign="left";ctx.fillStyle=text;ctx.font="12px Segoe UI";ctx.fillText("Pedidos únicos liberados",L,14);drawDailyMatrix(rows);
+ ctx.textAlign="left";ctx.fillStyle=text;ctx.font="12px Segoe UI";ctx.fillText("Volumes liberados",L,14);drawDailyMatrix(rows);
 }
 function drawDailyMatrix(rows){
  const byMonth={};
- Object.entries(uniqueReleasedByDay(rows)).forEach(([key,count])=>{const month=key.slice(0,7),day=Number(key.slice(8,10));if(!byMonth[month])byMonth[month]={};byMonth[month][day]=count});
+ Object.entries(volumeReleasedByDay(rows)).forEach(([key,count])=>{const month=key.slice(0,7),day=Number(key.slice(8,10));if(!byMonth[month])byMonth[month]={};byMonth[month][day]=count});
  const months=Object.keys(byMonth).sort();
  let head='<tr><th>Mês</th>'+Array.from({length:31},(_,i)=>`<th>${i+1}</th>`).join('')+'<th>Total</th></tr>';
  $("dailyHead").innerHTML=head;
