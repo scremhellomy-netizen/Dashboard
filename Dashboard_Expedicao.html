@@ -80,6 +80,21 @@ table{border-collapse:collapse;width:100%;font-size:12px}th,td{padding:10px 12px
 .ex-sidebar .logo{flex-shrink:0}.ex-sidebrand{display:flex;align-items:center;gap:12px;padding:6px 5px 22px}.ex-sidebrand span{font-weight:800;white-space:nowrap}.ex-sideitem{width:100%;border:0;background:transparent;color:var(--text);text-align:left;display:flex;align-items:center;gap:12px;padding:13px 12px;border-radius:10px;cursor:pointer;font-weight:700;margin-bottom:7px}.ex-sideitem:hover,.ex-sideitem.active{background:rgba(4,100,252,.12);color:var(--accent)}.ex-sideitem .ex-ico{font-size:19px;width:23px;text-align:center}.ex-sideitem .ex-label{white-space:nowrap}.ex-sidebottom{margin-top:auto}.ex-toggle{position:fixed;left:243px;top:17px;z-index:65;border:1px solid var(--border);border-radius:10px;background:var(--card);color:var(--text);padding:9px 11px;cursor:pointer;transition:left .2s}.ex-shell{margin-left:232px;transition:margin-left .2s}.ex-shell>.container{max-width:1500px}.ex-collapsed .ex-sidebar{width:74px}.ex-collapsed .ex-sidebrand span,.ex-collapsed .ex-sideitem .ex-label,.ex-collapsed .ex-sidebottom .ex-label{display:none}.ex-collapsed .ex-shell{margin-left:74px}.ex-collapsed .ex-toggle{left:85px}.ex-collapsed .ex-sideitem{justify-content:center}.ex-page[hidden]{display:none!important}.ex-story-filters{display:grid;grid-template-columns:repeat(4,1fr) auto;gap:10px;margin-bottom:18px}.ex-story-filters .multi-menu{z-index:70}.ex-story-filters .select{width:100%}.ex-story-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:16px}.ex-story-chart{margin-bottom:16px}.ex-story-chart canvas{height:340px}.ex-story-alert{border-left:4px solid #D92D20;background:rgba(217,45,32,.08);padding:12px 14px;border-radius:9px;margin:10px 0;font-size:13px}.ex-story-ok{border-left-color:#16a34a;background:rgba(22,163,74,.07)}.ex-story-table{max-height:380px}.ex-story-legend{display:flex;flex-wrap:wrap;gap:14px;color:var(--muted);font-size:12px;margin:8px 0}.ex-story-legend b{color:var(--text)}.ex-legend-swatch{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:5px;vertical-align:middle}.ex-legend-line{display:inline-block;width:20px;border-top:3px dashed #04C4FC;vertical-align:middle;margin-right:5px}.ex-detail-scroll{overflow-x:auto;border:1px solid var(--border);border-radius:12px}.ex-detail-scroll canvas{display:block;height:310px}.ex-insight-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:12px 0}.ex-insight-card{background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:13px}.ex-insight-card strong{display:block;font-size:20px;margin:5px 0}.ex-insight-card span{font-size:12px;color:var(--muted)}
 @media(max-width:1000px){.ex-insight-grid{grid-template-columns:1fr}.ex-story-kpis{grid-template-columns:repeat(2,1fr)}.ex-story-filters{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:700px){.ex-sidebar{width:232px;transform:translateX(-100%)}.ex-shell,.ex-collapsed .ex-shell{margin-left:0}.ex-toggle,.ex-collapsed .ex-toggle{left:12px;top:10px}.ex-sidebar.ex-mobile-open{transform:translateX(0)}.ex-story-filters{grid-template-columns:1fr}.ex-story-kpis{grid-template-columns:1fr}.ex-shell>.container{padding-top:58px}}
+
+/* Análises segmentadas: mesmas cores, tipografia e cards da visão operacional */
+.ex-segment-toolbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:12px 0 16px}.ex-segment-toolbar .select{min-width:190px}
+.ex-segment-table{max-height:400px}.ex-segment-table th,.ex-segment-table td{white-space:nowrap}
+.ex-segment-chart{height:340px!important}.ex-segment-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:12px}
+.ex-segment-actions .pillar{line-height:1.6}.ex-segment-actions strong{display:block;font-size:13px;margin-bottom:6px}.ex-segment-actions p{margin:5px 0;font-size:12px;color:var(--muted)}
+.ex-segment-note{font-size:11px;color:var(--muted);margin-top:10px;line-height:1.6}
+@media(max-width:700px){.ex-segment-actions{grid-template-columns:1fr}.ex-segment-toolbar .select{width:100%}}
+
+/* Evolução final: diagnósticos adicionais exclusivos do Storytelling */
+.ex-final-toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:10px 0 16px}.ex-final-toolbar label{font-size:12px;color:var(--muted);font-weight:700}.ex-final-toolbar .select{min-width:135px}
+.ex-final-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-bottom:16px}.ex-final-grid .card{padding:18px;min-width:0}.ex-final-grid canvas{height:290px}
+.ex-final-stat{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:14px}.ex-final-stat .pillar strong{display:block;font-size:23px;margin:5px 0}.ex-final-stat .pillar span{font-size:11px;color:var(--muted)}
+.ex-final-tip{font-size:12px;color:var(--muted);line-height:1.6;margin-top:10px}.ex-final-priorities{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.ex-final-priorities .pillar{border-left:3px solid #0464FC;line-height:1.6}.ex-final-priorities .pillar strong{display:block;margin-bottom:5px}.ex-final-priorities .pillar small{color:var(--muted)}
+@media(max-width:1000px){.ex-final-grid{grid-template-columns:1fr}.ex-final-stat{grid-template-columns:1fr 1fr}}@media(max-width:600px){.ex-final-stat,.ex-final-priorities{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -189,6 +204,39 @@ table{border-collapse:collapse;width:100%;font-size:12px}th,td{padding:10px 12px
  <div class="card chart-card ex-story-chart"><div class="chart-title">Pedidos únicos liberados × média diária</div><div class="chart-sub">Última liberação conhecida por OV · média por dia útil · linha tracejada = média</div><canvas id="exStoryChart"></canvas><div class="ex-story-legend"><span><i class="ex-legend-swatch" style="background:#0464FC"></i>Liberados</span><span><i class="ex-legend-swatch" style="background:#D92D20"></i>Abaixo do limite</span><span><i class="ex-legend-swatch" style="background:#F79009"></i>Dia útil sem liberação</span><span><i class="ex-legend-line"></i>Média diária</span></div></div>
  <div class="card chart-card" style="margin-bottom:16px"><div class="chart-title">Narrativa gerencial e alertas</div><div id="exStoryNarrative"></div></div>
  <div class="card chart-card" style="margin-bottom:16px"><div class="chart-title">Detalhamento diário · desvios de produtividade</div><div class="chart-sub">Barras mostram a diferença de pedidos em relação à média do período. Vermelho = abaixo; azul = acima; laranja = sem liberação. Passe o cursor sobre as barras para identificar data e volume.</div><div class="ex-detail-scroll" id="exDetailScroll"><canvas id="exStoryDetailChart" aria-label="Desvios diários de pedidos em relação à média"></canvas></div><div class="ex-story-legend"><span><i class="ex-legend-swatch" style="background:#0464FC"></i>Acima da média</span><span><i class="ex-legend-swatch" style="background:#D92D20"></i>Abaixo da média</span><span><i class="ex-legend-swatch" style="background:#F79009"></i>Sem liberação</span></div><div class="ex-insight-grid" id="exDetailInsights"></div></div>
+
+ <div class="card chart-card" style="margin-bottom:16px" id="exSegmentationPanel">
+  <div class="chart-title">Diagnóstico de gargalos por segmento</div>
+  <div class="chart-sub">Compare pilares, canais e tipos de ordem por volume, participação e regularidade das liberações, respeitando todos os filtros gerenciais.</div>
+  <div class="ex-segment-toolbar"><label for="exSegmentDimension" class="kpi-label">AGRUPAR POR</label><select class="select" id="exSegmentDimension"><option value="PILAR">Pilar operacional</option><option value="CANAL">Canal de venda</option><option value="TIPO_ORDEM">Tipo de ordem</option></select><label for="exSegmentMetric" class="kpi-label">INDICADOR</label><select class="select" id="exSegmentMetric"><option value="volume">Pedidos únicos liberados</option><option value="share">Participação no volume (%)</option><option value="volatility">Dias abaixo de 70% da própria média (%)</option></select></div>
+  <canvas class="ex-segment-chart" id="exSegmentChart" aria-label="Comparativo de produtividade por segmento"></canvas>
+  <div class="ex-segment-table table-wrap"><table><thead><tr><th>Segmento</th><th>Pedidos únicos</th><th>Participação</th><th>Média / dia útil</th><th>Dias com liberação</th><th>Dias abaixo de 70%</th><th>Concentração no pico</th></tr></thead><tbody id="exSegmentBody"></tbody></table></div>
+  <div class="ex-segment-note">A participação é calculada sobre OVs distintas no recorte; se uma OV tiver múltiplos segmentos, ela poderá aparecer em mais de um grupo. A taxa de dias abaixo de 70% usa a média do próprio segmento e considera apenas dias úteis do período. Picos e oscilações são sinais para investigação, não comprovação de causa.</div>
+  <div class="ex-segment-actions" id="exSegmentActions"></div>
+ </div>
+ <div class="card chart-card" style="margin-bottom:16px"><div class="chart-title">Prioridades de atuação gerencial</div><div class="chart-sub">Hipóteses de melhoria sugeridas a partir dos resultados filtrados.</div><div id="exSegmentPriorities"></div></div>
+ <div class="card chart-card" style="margin-bottom:16px" id="exFlowPanel">
+  <div class="chart-title">Demanda registrada × aprovações × liberações</div>
+  <div class="chart-sub">Compare o fluxo de pedidos por dia útil para distinguir variação de entrada, aprovações e saída. Cada série conta OVs distintas no respectivo evento; não representa estoque histórico de pedidos disponíveis.</div>
+  <div class="ex-story-kpis" id="exFlowKpis"></div>
+  <div class="ex-detail-scroll" id="exFlowScroll"><canvas id="exFlowChart" aria-label="Fluxo diário de pedidos criados, aprovados e liberados"></canvas></div>
+  <div class="ex-story-legend"><span><i class="ex-legend-swatch" style="background:#9444FC"></i>Criados</span><span><i class="ex-legend-swatch" style="background:#04C4FC"></i>Aprovados</span><span><i class="ex-legend-swatch" style="background:#0464FC"></i>Liberados</span></div>
+  <div id="exFlowInsights" class="ex-insight-grid"></div>
+  <div class="ex-segment-table table-wrap"><table><thead><tr><th>Dia útil</th><th>Criados</th><th>Aprovados</th><th>Liberados</th><th>Leitura gerencial</th></tr></thead><tbody id="exFlowBody"></tbody></table></div>
+  <div class="ex-segment-note">Diagnóstico de fluxo, não de capacidade: criação, aprovação e liberação podem ocorrer em dias diferentes. A diferença entre eventos no mesmo dia não é backlog. O saldo de pedidos efetivamente disponíveis exige histórico de status, bloqueios, cancelamentos e elegibilidade em cada data. Feriados não são excluídos automaticamente.</div>
+ </div>
+
+ <div class="card chart-card" style="margin-bottom:16px" id="exLeadPanel">
+  <div class="chart-title">Tempo entre aprovação e liberação · eficiência do fluxo</div>
+  <div class="chart-sub">Tempo decorrido em dias corridos entre o registro de aprovação e a última liberação da OV. Não equivale ao tempo de separação nem comprova disponibilidade física do pedido.</div>
+  <div class="ex-story-kpis" id="exLeadKpis"></div>
+  <div class="ex-segment-toolbar"><label class="kpi-label" for="exLeadDimension">COMPARAR POR</label><select class="select" id="exLeadDimension"><option value="PILAR">Pilar operacional</option><option value="CANAL">Canal de venda</option><option value="TIPO_ORDEM">Tipo de ordem</option></select><label class="kpi-label" for="exLeadTarget">REFERÊNCIA DE ANÁLISE</label><select class="select" id="exLeadTarget"><option value="1">Até 1 dia corrido</option><option value="2">Até 2 dias corridos</option><option value="3">Até 3 dias corridos</option><option value="5">Até 5 dias corridos</option></select></div>
+  <div class="ex-detail-scroll" id="exLeadScroll"><canvas id="exLeadChart" aria-label="Tempo mediano entre aprovação e liberação por segmento"></canvas></div>
+  <div class="ex-story-legend"><span><i class="ex-legend-swatch" style="background:#0464FC"></i>Mediana do segmento</span><span><i class="ex-legend-swatch" style="background:#D92D20"></i>Acima da referência</span><span><i class="ex-legend-line"></i>Referência selecionada</span></div>
+  <div class="ex-segment-table table-wrap"><table><thead><tr><th>Segmento</th><th>OVs com datas válidas</th><th>Mediana (dias)</th><th>P90 (dias)</th><th>Acima da referência</th><th>Sem aprovação</th></tr></thead><tbody id="exLeadBody"></tbody></table></div>
+  <div class="ex-segment-actions" id="exLeadActions"></div>
+  <div class="ex-segment-note">Amostra formada por OVs com liberação no período selecionado, respeitando os filtros gerenciais. A data de aprovação é a primeira conhecida e a liberação é a última conhecida. Valores negativos e registros sem datas são excluídos do tempo calculado e informados na cobertura. A referência é exploratória, não SLA contratual. A exportação atual não traz histórico completo de bloqueios, elegibilidade, cancelamentos ou capacidade disponível.</div>
+ </div>
  <div class="card chart-card" style="margin-bottom:16px"><div class="chart-title">Confiabilidade da análise de reliberações</div><div id="exStoryAudit" class="subtitle"></div></div>
 </section>
 <div id="observationFloatingCard" class="observation-floating-card" role="tooltip" hidden>
@@ -529,14 +577,194 @@ function exDetailInsights(days,counts,avg){
  const below=days.filter(d=>(counts[d]||0)<avg).length,zero=days.filter(d=>!(counts[d]||0)).length;
  $('exDetailInsights').innerHTML=`<div class="ex-insight-card"><span>Dia da semana com menor média</span><strong>${worst?weekdayNames[worst.wd]:'—'}</strong><span>${worst?worst.avg.toFixed(1).replace('.',','):'—'} pedidos/dia · ${worst?worst.days:0} dias analisados</span></div><div class="ex-insight-card"><span>Diferença entre melhor e pior dia da semana</span><strong>${gap.toFixed(1).replace('.',',')}%</strong><span>${best?weekdayNames[best.wd]:'—'} × ${worst?weekdayNames[worst.wd]:'—'} · investigar distribuição da demanda</span></div><div class="ex-insight-card"><span>Dias úteis abaixo da média</span><strong>${below} de ${days.length}</strong><span>${zero} sem liberação · verificar disponibilidade de pedidos e capacidade</span></div>`;
 }
+// Fluxo de eventos: conta cada OV uma vez por etapa; não presume fila disponível.
+function exFlowEventRows(){
+ const map=new Map();
+ DATA.forEach(r=>{const ov=orderKey(r['Ordem de venda']);if(!ov)return;
+  if(!map.has(ov))map.set(ov,[]);map.get(ov).push(r);
+ });
+ return [...map.values()].map(group=>{
+  const latest=[...group].sort((a,b)=>(parseDate(b.DATA_AG)?.getTime()||0)-(parseDate(a.DATA_AG)?.getTime()||0))[0];
+  const event=(col)=>group.map(r=>dateKey(r[col])).filter(Boolean).sort()[0]||'';
+  return {row:latest,created:event('Data e hora criadas'),approved:event('Data aprovada'),released:group.map(r=>dateKey(r.DATA_AG)).filter(Boolean).sort().at(-1)||''};
+ });
+}
+function exRenderFlow(days){
+ const events=exFlowEventRows(),filters=exStoryFields.filter(([id])=>id!=='month');
+ const scoped=events.filter(e=>filters.every(([id,label,col])=>!exStorySelected[id].size||exStorySelected[id].has(norm(e.row[col]))));
+ const daySet=new Set(days),counts={created:{},approved:{},released:{}};
+ const coverage={created:0,approved:0,released:0};
+ scoped.forEach(e=>{for(const key of ['created','approved','released']){if(e[key])coverage[key]++;if(daySet.has(e[key]))counts[key][e[key]]=(counts[key][e[key]]||0)+1}});
+ const sum=k=>days.reduce((v,d)=>v+(counts[k][d]||0),0),created=sum('created'),approved=sum('approved'),released=sum('released');
+ const total=scoped.length;
+ const fmt=n=>n.toFixed(1).replace('.',',');
+ const cards=[['CRIADOS NO PERÍODO',created,'OVs por data de criação'],['APROVADOS NO PERÍODO',approved,'OVs por data de aprovação'],['LIBERADOS NO PERÍODO',released,'OVs pela última liberação'],['COBERTURA DE APROVAÇÃO',total?fmt(100*coverage.approved/total)+'%':'—','Entre OVs do recorte por segmento']];
+ $('exFlowKpis').innerHTML=cards.map(([l,v,n])=>`<div class="card kpi"><div class="kpi-label">${l}</div><div class="kpi-value">${typeof v==='number'?fmtInt(v):v}</div><div class="kpi-note">${n}</div></div>`).join('');
+ const wrap=$('exFlowScroll'),canvas=$('exFlowChart'),width=Math.max(520,wrap.clientWidth-2,days.length*38+75),height=310,scale=devicePixelRatio||1;
+ canvas.style.width=width+'px';canvas.style.height=height+'px';canvas.width=Math.round(width*scale);canvas.height=Math.round(height*scale);
+ const ctx=canvas.getContext('2d');ctx.setTransform(scale,0,0,scale,0,0);
+ const css=getComputedStyle(document.body),ink=css.getPropertyValue('--text'),muted=css.getPropertyValue('--muted'),border=css.getPropertyValue('--border');
+ const L=48,R=15,T=26,B=58,pw=width-L-R,ph=height-T-B,max=Math.max(1,...days.flatMap(d=>['created','approved','released'].map(k=>counts[k][d]||0)))*1.13;
+ ctx.font='10px Segoe UI';ctx.fillStyle=muted;ctx.strokeStyle=border;
+ for(let i=0;i<=4;i++){let y=T+i*ph/4;ctx.beginPath();ctx.moveTo(L,y);ctx.lineTo(width-R,y);ctx.stroke();ctx.fillText(fmtInt(max*(1-i/4)),4,y+4)}
+ const colors={created:'#9444FC',approved:'#04C4FC',released:'#0464FC'},step=pw/Math.max(1,days.length),bw=Math.min(10,step*.24);
+ days.forEach((d,i)=>{const center=L+(i+.5)*step;
+  ['created','approved','released'].forEach((k,j)=>{const v=counts[k][d]||0,x=center+(j-1)*bw*1.1,y=T+ph-v/max*ph;ctx.fillStyle=colors[k];ctx.fillRect(x-bw/2,y,bw,Math.max(v?1:0,T+ph-y));if(days.length<=22&&v){ctx.fillStyle=ink;ctx.textAlign='center';ctx.font='9px Segoe UI';ctx.fillText(fmtInt(v),x,y-4)}});
+  if(days.length<=30||i%Math.ceil(days.length/24)===0){ctx.save();ctx.translate(center,height-22);ctx.rotate(-Math.PI/4);ctx.fillStyle=muted;ctx.textAlign='right';ctx.font='10px Segoe UI';ctx.fillText(d.slice(8)+'/'+d.slice(5,7),0,0);ctx.restore()}
+ });
+ const approvedNoRelease=scoped.filter(e=>e.approved&&!e.released).length;
+ const createdNoApproval=scoped.filter(e=>e.created&&!e.approved).length;
+ const lowRelease=days.filter(d=>(counts.released[d]||0)<(counts.approved[d]||0)).length;
+ $('exFlowInsights').innerHTML=`<div class="pillar"><strong>${fmtInt(approvedNoRelease)} OVs aprovadas sem data de liberação</strong><div class="pillar-metrics">Situação na exportação atual, não fila histórica nem confirmação de disponibilidade operacional. Validar status e bloqueios.</div></div><div class="pillar"><strong>${fmtInt(createdNoApproval)} OVs criadas sem data de aprovação</strong><div class="pillar-metrics">Investigar completude do campo, regras de aprovação e possíveis pendências anteriores ao estoque.</div></div><div class="pillar"><strong>${fmtInt(lowRelease)} dias com liberações inferiores às aprovações</strong><div class="pillar-metrics">Indício de descompasso temporal entre etapas; investigar defasagem e composição das ordens, não inferir acúmulo automaticamente.</div></div><div class="pillar"><strong>${fmtInt(total-coverage.created)} OVs sem data de criação</strong><div class="pillar-metrics">A qualidade dos campos influencia a comparação e a interpretação gerencial.</div></div>`;
+ $('exFlowBody').innerHTML=days.map(d=>{const c=counts.created[d]||0,a=counts.approved[d]||0,l=counts.released[d]||0;let note=l<a?'Saída inferior às aprovações':l>a?'Saída superior às aprovações':'Fluxos equivalentes';if(!c&&!a&&!l)note='Sem eventos registrados';return `<tr><td>${escapeHtml(d)}</td><td>${fmtInt(c)}</td><td>${fmtInt(a)}</td><td>${fmtInt(l)}</td><td>${note}</td></tr>`}).join('')||'<tr><td colspan="5" class="empty">Sem dias úteis no recorte.</td></tr>';
+}
 function exRenderStory(){if(!DATA.length)return;const rows=exStoryRows(),allDates=latestReleaseRows(DATA).map(r=>dateKey(r.DATA_AG)).filter(Boolean).sort();let last=allDates.at(-1);if(!last)return;let first=allDates[0];if(exStoryRange){const d=new Date(last+'T12:00:00');d.setDate(d.getDate()-Number(exStoryRange)+1);first=dateKey(d)}else if(exStorySelected.month.size){const months=[...exStorySelected.month].sort();const m=months[0];if(/^\d{4}-\d{2}$/.test(m)){first=m+'-01';const maxMonth=months.at(-1);const endMonth=new Date(maxMonth+'-01T12:00:00');endMonth.setMonth(endMonth.getMonth()+1);endMonth.setDate(0);last=last<dateKey(endMonth)?last:dateKey(endMonth)}}const days=exWeekdays(first,last),by=uniqueReleasedByDay(rows),total=days.reduce((a,d)=>a+(by[d]||0),0),avg=days.length?total/days.length:0,zero=days.filter(d=>!by[d]),low=days.filter(d=>by[d]>0&&by[d]<avg*exStoryLimit/100);const uniq=new Set(rows.map(r=>orderKey(r['Ordem de venda']))).size;const cards=[['PEDIDOS ÚNICOS',uniq,'Última liberação conhecida'],['MÉDIA / DIA ÚTIL',avg.toFixed(1).replace('.',','),'Pedidos por dia útil'],['DIAS ÚTEIS SEM LIBERAÇÃO',zero.length,'Segunda a sexta, sem feriados'],['DIAS ABAIXO DO LIMITE',low.length,'Abaixo de '+exStoryLimit+'% da média']];$('exStoryKpis').innerHTML=cards.map(([l,v,n])=>`<div class="card kpi"><div class="kpi-label">${l}</div><div class="kpi-value">${v}</div><div class="kpi-note">${n}</div></div>`).join('');exDrawStory(days,by,avg);
  const worst=[...days].filter(d=>by[d]>0).sort((a,b)=>by[a]-by[b]).slice(0,5);$('exStoryNarrative').innerHTML=`<div class="ex-story-alert ${zero.length?'':'ex-story-ok'}"><b>${zero.length} dias úteis sem liberação</b> no intervalo analisado. ${zero.length?'Datas: '+zero.slice(0,15).map(escapeHtml).join(', ')+(zero.length>15?'…':''): 'Não foram identificados dias úteis zerados.'}</div><div class="ex-story-alert ${low.length?'':'ex-story-ok'}"><b>${low.length} dias com desempenho abaixo de ${exStoryLimit}% da média</b> (${avg.toFixed(1).replace('.',',')} pedidos/dia útil). ${low.length?'Priorizar a análise dos dias com menor produtividade.':'Nenhum dia com atividade ficou abaixo do limite.'}</div><p class="subtitle">Menores volumes com atividade: ${worst.map(d=>escapeHtml(d)+' ('+fmtInt(by[d])+')').join(' · ')||'não disponível'}.</p><p class="subtitle">Os dias sem registros são indícios para investigação, não prova de ociosidade: feriados, ausência de carga ou falha na origem podem explicar os zeros.</p>`;
- exDrawDetail(days,by,avg);exDetailInsights(days,by,avg);
+ exDrawDetail(days,by,avg);exDetailInsights(days,by,avg);exRenderSegments(rows,days);exRenderFlow(days);exRenderLead(rows);exRenderFinal(rows,days,by,avg);
  const ovCount=new Map(),ovDays=new Map();DATA.forEach(r=>{const k=orderKey(r['Ordem de venda']);if(!k)return;ovCount.set(k,(ovCount.get(k)||0)+1);const day=dateKey(r.DATA_AG);if(day){if(!ovDays.has(k))ovDays.set(k,new Set());ovDays.get(k).add(day)}});const repeated=[...ovDays.values()].filter(set=>set.size>1).length,missing=DATA.filter(r=>!dateKey(r.DATA_AG)).length;$('exStoryAudit').innerHTML=`<b>${fmtInt(repeated)} OVs</b> com liberações em datas diferentes detectadas na base atual · <b>${fmtInt(missing)} registros</b> sem data de liberação (não incluídos na série diária). A identificação histórica depende de a origem preservar os eventos anteriores. Pedidos com múltiplas linhas na mesma data são contados uma única vez.`;
 }
+
+// Segmentação gerencial independente: uma OV por grupo, na última data conhecida.
+function exSegmentData(rows,days,field){
+ const groups=new Map(),overall=new Set();
+ rows.forEach(r=>{
+  const ov=orderKey(r['Ordem de venda']),day=dateKey(r.DATA_AG),name=norm(r[field])||'Não informado';
+  if(!ov||!day)return;
+  overall.add(ov);
+  if(!groups.has(name))groups.set(name,{name,orders:new Set(),daily:new Map()});
+  const g=groups.get(name);g.orders.add(ov);
+  if(!g.daily.has(day))g.daily.set(day,new Set());g.daily.get(day).add(ov);
+ });
+ const list=[...groups.values()].map(g=>{
+  const volume=g.orders.size,values=days.map(d=>g.daily.get(d)?.size||0),mean=days.length?values.reduce((a,b)=>a+b,0)/days.length:0;
+  const low=mean>0?values.filter(v=>v<mean*.7).length:0,active=values.filter(v=>v>0).length,peak=Math.max(0,...values);
+  return {name:g.name,volume,share:overall.size?volume/overall.size*100:0,mean,active,low,lowRate:days.length?low/days.length*100:0,peak,peakShare:volume?peak/volume*100:0};
+ }).sort((a,b)=>b.volume-a.volume||a.name.localeCompare(b.name,'pt-BR'));
+ return {list,overall:overall.size};
+}
+function exDrawSegments(list,metric){
+ const canvas=$('exSegmentChart'),{ctx,w,h}=clearCanvas(canvas),css=getComputedStyle(document.body);
+ const ink=css.getPropertyValue('--text'),muted=css.getPropertyValue('--muted'),border=css.getPropertyValue('--border');
+ ctx.clearRect(0,0,w,h);if(!list.length){ctx.fillStyle=muted;ctx.fillText('Sem dados para os filtros selecionados.',18,30);return}
+ const top=list.slice(0,9),L=Math.min(165,Math.max(100,w*.29)),R=58,T=14,B=15,rowH=(h-T-B)/top.length;
+ const max=Math.max(1,...top.map(g=>metric==='volume'?g.volume:metric==='share'?g.share:g.lowRate));
+ top.forEach((g,i)=>{
+  const value=metric==='volume'?g.volume:metric==='share'?g.share:g.lowRate,y=T+i*rowH+rowH*.21,barH=Math.min(23,rowH*.56);
+  ctx.fillStyle=muted;ctx.font='11px Segoe UI';ctx.textAlign='right';const label=g.name.length>21?g.name.slice(0,20)+'…':g.name;ctx.fillText(label,L-10,y+barH*.7);
+  ctx.fillStyle=border;ctx.fillRect(L,y,Math.max(1,w-L-R),barH);
+  ctx.fillStyle=metric==='volatility'&&value>=50?'#D92D20':(COLORS[g.name]||'#0464FC');ctx.fillRect(L,y,Math.max(0,(w-L-R)*value/max),barH);
+  ctx.fillStyle=ink;ctx.textAlign='left';ctx.font='bold 11px Segoe UI';ctx.fillText(metric==='volume'?fmtInt(value):value.toFixed(1).replace('.',',')+'%',Math.min(w-R+5,L+5+(w-L-R)*value/max),y+barH*.7);
+ });ctx.textAlign='left';
+}
+function exRenderSegments(rows,days){
+ const field=$('exSegmentDimension').value,metric=$('exSegmentMetric').value,{list,overall}=exSegmentData(rows,days,field);
+ exDrawSegments(list,metric);
+ const fmtPct=n=>n.toFixed(1).replace('.',',')+'%';
+ $('exSegmentBody').innerHTML=list.map(g=>`<tr><td>${escapeHtml(g.name)}</td><td>${fmtInt(g.volume)}</td><td>${fmtPct(g.share)}</td><td>${g.mean.toFixed(1).replace('.',',')}</td><td>${fmtInt(g.active)} / ${days.length}</td><td>${fmtInt(g.low)} (${fmtPct(g.lowRate)})</td><td>${fmtPct(g.peakShare)}</td></tr>`).join('')||'<tr><td colspan="7" class="empty">Sem dados no recorte selecionado.</td></tr>';
+ const largest=list[0],irregular=list.filter(g=>g.volume>=Math.max(10,overall*.01)).sort((a,b)=>b.lowRate-a.lowRate)[0],concentrated=list.filter(g=>g.volume>=10).sort((a,b)=>b.peakShare-a.peakShare)[0];
+ $('exSegmentActions').innerHTML=`<div class="pillar"><strong>Maior concentração de demanda</strong><div class="pillar-metrics">${largest?escapeHtml(largest.name)+' · '+fmtInt(largest.volume)+' OVs ('+fmtPct(largest.share)+')':'Sem dados'}</div><p>Verificar se o dimensionamento e a distribuição de atividades acompanham o segmento mais representativo.</p></div><div class="pillar"><strong>Maior irregularidade relevante</strong><div class="pillar-metrics">${irregular?escapeHtml(irregular.name)+' · '+fmtPct(irregular.lowRate)+' dos dias úteis abaixo de 70% da própria média':'Amostra insuficiente'}</div><p>Conferir a regularidade de chegada das ordens, aprovações e disponibilidade de recursos.</p></div><div class="pillar"><strong>Maior concentração em um único dia</strong><div class="pillar-metrics">${concentrated?escapeHtml(concentrated.name)+' · '+fmtPct(concentrated.peakShare)+' do volume do segmento':'Amostra insuficiente'}</div><p>Investigar acúmulo de liberações e oportunidades de nivelamento da carga diária.</p></div><div class="pillar"><strong>Escopo do diagnóstico</strong><div class="pillar-metrics">${fmtInt(overall)} OVs distintas · ${fmtInt(list.length)} segmentos · ${fmtInt(days.length)} dias úteis</div><p>Altere o agrupamento e combine os filtros para localizar os pontos que merecem análise prioritária.</p></div>`;
+ const priority=[];
+ if(largest)priority.push(`<b>1. Dimensionamento:</b> avaliar a capacidade dedicada a <b>${escapeHtml(largest.name)}</b>, que concentra ${fmtPct(largest.share)} das OVs no recorte.`);
+ if(irregular)priority.push(`<b>2. Regularidade:</b> investigar as liberações de <b>${escapeHtml(irregular.name)}</b>; ${fmtPct(irregular.lowRate)} dos dias úteis ficaram abaixo de 70% de sua própria média.`);
+ if(concentrated)priority.push(`<b>3. Nivelamento:</b> avaliar o calendário de <b>${escapeHtml(concentrated.name)}</b>, cujo maior dia representou ${fmtPct(concentrated.peakShare)} das liberações do segmento.`);
+ priority.push('<b>4. Validação da causa:</b> cruzar os dias críticos com fila disponível, aprovações, equipe e indisponibilidades. Esses dados não constam desta base e não permitem concluir que a baixa liberação foi causada pela equipe de estoque.');
+ $('exSegmentPriorities').innerHTML=priority.map(x=>`<div class="ex-story-alert ex-story-ok" style="border-left-color:#0464FC;background:rgba(4,100,252,.06)">${x}</div>`).join('');
+}
+$('exSegmentDimension').addEventListener('change',()=>exRenderStory());
+$('exSegmentMetric').addEventListener('change',()=>exRenderStory());
+
 function exSwitch(page){$('exOverview').hidden=page!=='overview';$('exStory').hidden=page!=='story';$('exNavOverview').classList.toggle('active',page==='overview');$('exNavStory').classList.toggle('active',page==='story');if(page==='story')exRenderStory();else render();if(innerWidth<=700)$('exSidebar').classList.remove('ex-mobile-open')}
 $('exNavOverview').addEventListener('click',()=>exSwitch('overview'));$('exNavStory').addEventListener('click',()=>exSwitch('story'));$('exToggle').addEventListener('click',()=>{if(innerWidth<=700){$('exSidebar').classList.toggle('ex-mobile-open')}else{document.body.classList.toggle('ex-collapsed');$('exToggle').setAttribute('aria-expanded',String(!document.body.classList.contains('ex-collapsed')))}setTimeout(()=>{if(!$('exStory').hidden)exRenderStory();else render()},230)});
 exBuildFilters();
+
+// V5: leitura do intervalo entre aprovação e liberação, sem presumir capacidade ou fila disponível.
+function exRenderLead(rows){
+ const dim=$('exLeadDimension').value,limit=Number($('exLeadTarget').value),selected=new Set(rows.map(r=>orderKey(r['Ordem de venda'])));
+ const events=exFlowEventRows().filter(e=>selected.has(orderKey(e.row['Ordem de venda'])));
+ const by=new Map(),valid=[],invalid=[];let noApproval=0,noRelease=0;
+ for(const e of events){
+  const name=norm(e.row[dim])||'Não informado';if(!by.has(name))by.set(name,{values:[],missing:0});const g=by.get(name);
+  if(!e.approved){noApproval++;g.missing++;continue}if(!e.released){noRelease++;continue}
+  const a=parseDate(e.approved),b=parseDate(e.released);if(!a||!b)continue;
+  const elapsed=(b.getTime()-a.getTime())/86400000;
+  if(elapsed<0){invalid.push(e);continue}g.values.push(elapsed);valid.push({ov:orderKey(e.row['Ordem de venda']),name,elapsed});
+ }
+ const percentile=(vals,p)=>{if(!vals.length)return null;const a=[...vals].sort((x,y)=>x-y),idx=(a.length-1)*p,lo=Math.floor(idx),hi=Math.ceil(idx);return a[lo]+(a[hi]-a[lo])*(idx-lo)};
+ const f=v=>v===null?'—':v.toLocaleString('pt-BR',{maximumFractionDigits:1,minimumFractionDigits:1});
+ const med=percentile(valid.map(v=>v.elapsed),.5),p90=percentile(valid.map(v=>v.elapsed),.9),late=valid.filter(v=>v.elapsed>limit).length,coverage=events.length?100*valid.length/events.length:0;
+ const kpis=[['MEDIANA APROVAÇÃO → LIBERAÇÃO',f(med)+' d','50% das OVs válidas até este tempo'],['P90 DO INTERVALO',f(p90)+' d','90% das OVs válidas até este tempo'],['ACIMA DA REFERÊNCIA',fmtInt(late),'Entre '+fmtInt(valid.length)+' OVs com intervalo válido'],['COBERTURA DO INDICADOR',f(coverage)+'%','OVs com ambas as datas e sequência coerente']];
+ $('exLeadKpis').innerHTML=kpis.map(([l,v,n])=>`<div class="card kpi"><div class="kpi-label">${l}</div><div class="kpi-value">${v}</div><div class="kpi-note">${n}</div></div>`).join('');
+ const segments=[...by.entries()].map(([name,g])=>({name,n:g.values.length,median:percentile(g.values,.5),p90:percentile(g.values,.9),late:g.values.filter(x=>x>limit).length,missing:g.missing})).sort((a,b)=>(b.median??-1)-(a.median??-1));
+ $('exLeadBody').innerHTML=segments.map(g=>`<tr><td>${escapeHtml(g.name)}</td><td>${fmtInt(g.n)}</td><td>${f(g.median)}</td><td>${f(g.p90)}</td><td>${g.n?f(100*g.late/g.n)+'%':'—'}</td><td>${fmtInt(g.missing)}</td></tr>`).join('')||'<tr><td colspan="6" class="empty">Nenhuma OV disponível no recorte.</td></tr>';
+ const chartRows=segments.filter(g=>g.n>0).slice(0,18),wrap=$('exLeadScroll'),canvas=$('exLeadChart'),width=Math.max(520,wrap.clientWidth-2,chartRows.length*76+100),height=315,scale=devicePixelRatio||1;
+ canvas.style.width=width+'px';canvas.style.height=height+'px';canvas.width=Math.round(width*scale);canvas.height=Math.round(height*scale);
+ const ctx=canvas.getContext('2d');ctx.setTransform(scale,0,0,scale,0,0);const css=getComputedStyle(document.body),ink=css.getPropertyValue('--text'),muted=css.getPropertyValue('--muted'),border=css.getPropertyValue('--border');
+ const L=48,R=20,T=35,B=90,pw=width-L-R,ph=height-T-B,max=Math.max(1,limit,...chartRows.map(g=>g.median))*1.2;
+ ctx.strokeStyle=border;ctx.fillStyle=muted;ctx.font='10px Segoe UI';for(let i=0;i<=4;i++){const y=T+i*ph/4;ctx.beginPath();ctx.moveTo(L,y);ctx.lineTo(width-R,y);ctx.stroke();ctx.fillText(f(max*(1-i/4)),4,y+4)}
+ const ry=T+ph-limit/max*ph;ctx.save();ctx.setLineDash([6,5]);ctx.strokeStyle='#D404BC';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(L,ry);ctx.lineTo(width-R,ry);ctx.stroke();ctx.restore();
+ const step=pw/Math.max(1,chartRows.length),bw=Math.min(38,step*.58);
+ chartRows.forEach((g,i)=>{const x=L+(i+.5)*step,y=T+ph-g.median/max*ph;ctx.fillStyle=g.median>limit?'#D92D20':'#0464FC';ctx.fillRect(x-bw/2,y,bw,T+ph-y);ctx.fillStyle=ink;ctx.textAlign='center';ctx.font='bold 11px Segoe UI';ctx.fillText(f(g.median),x,y-7);ctx.save();ctx.translate(x,height-15);ctx.rotate(-Math.PI/4);ctx.fillStyle=muted;ctx.font='10px Segoe UI';ctx.textAlign='right';ctx.fillText(g.name.length>23?g.name.slice(0,21)+'…':g.name,0,0);ctx.restore()});
+ const risk=segments.filter(g=>g.n>=5).sort((a,b)=>(b.late/b.n)-(a.late/a.n))[0],slow=segments.filter(g=>g.n>=5).sort((a,b)=>b.median-a.median)[0];
+ $('exLeadActions').innerHTML=`<div class="pillar"><strong>Maior exposição à referência</strong><div class="pillar-metrics">${risk?escapeHtml(risk.name)+' · '+f(100*risk.late/risk.n)+'% acima de '+limit+' dia(s)':'Amostra insuficiente'}</div><p>Priorizar investigação de aprovações, janelas de liberação e possíveis bloqueios neste segmento.</p></div><div class="pillar"><strong>Maior mediana de tempo</strong><div class="pillar-metrics">${slow?escapeHtml(slow.name)+' · '+f(slow.median)+' dia(s)':'Amostra insuficiente'}</div><p>Comparar a jornada destas OVs com segmentos de menor tempo, sem presumir causa operacional.</p></div><div class="pillar"><strong>Confiabilidade dos registros</strong><div class="pillar-metrics">${fmtInt(noApproval)} sem aprovação · ${fmtInt(noRelease)} sem liberação · ${fmtInt(invalid.length)} com sequência invertida</div><p>Investigar a origem dos campos antes de transformar intervalos em metas ou SLAs.</p></div><div class="pillar"><strong>Próximo dado necessário</strong><div class="pillar-metrics">Histórico de status e bloqueios por OV</div><p>Para medir fila elegível, tempo bloqueado, capacidade versus demanda e responsabilidade por etapa, incorporar eventos com data/hora e motivo.</p></div>`;
+}
+$('exLeadDimension').addEventListener('change',()=>{if(DATA.length)exRenderStory()});
+$('exLeadTarget').addEventListener('change',()=>{if(DATA.length)exRenderStory()});
+
+
+// Diagnósticos avançados: cálculo local, sem dependências externas e sem alterar a visão operacional.
+let exFinalCsv=[];
+function exFinalChart(id,labels,values,colors,unit=''){
+ const canvas=$(id),{ctx,w,h}=clearCanvas(canvas),css=getComputedStyle(document.body),ink=css.getPropertyValue('--text'),muted=css.getPropertyValue('--muted'),border=css.getPropertyValue('--border');
+ const L=46,R=18,T=34,B=70,pw=Math.max(1,w-L-R),ph=h-T-B,max=Math.max(1,...values)*1.18;
+ ctx.font='10px Segoe UI';ctx.strokeStyle=border;ctx.fillStyle=muted;
+ for(let j=0;j<=4;j++){const y=T+j*ph/4;ctx.beginPath();ctx.moveTo(L,y);ctx.lineTo(w-R,y);ctx.stroke();ctx.fillText(fmtInt(max*(1-j/4)),4,y+4)}
+ const step=pw/Math.max(1,values.length),bw=Math.min(52,step*.57);
+ values.forEach((v,i)=>{const x=L+(i+.5)*step,y=T+ph-v/max*ph;ctx.fillStyle=colors[i]||'#0464FC';if(v>0)ctx.fillRect(x-bw/2,y,bw,T+ph-y);ctx.fillStyle=ink;ctx.font='bold 11px Segoe UI';ctx.textAlign='center';ctx.fillText(unit==='percent'?v.toFixed(1).replace('.',',')+'%':(Number.isInteger(v)?fmtInt(v):v.toFixed(1).replace('.',',')),x,Math.max(14,y-7));ctx.fillStyle=muted;ctx.font='10px Segoe UI';const label=labels[i];ctx.fillText(label.length>13?label.slice(0,12)+'…':label,x,h-29)});
+}
+function exFinalEvents(){
+ const map=new Map();DATA.forEach(r=>{const ov=orderKey(r['Ordem de venda']);if(!ov)return;if(!map.has(ov))map.set(ov,[]);map.get(ov).push(r)});
+ return [...map.entries()].map(([ov,group])=>{const sorted=[...group].sort((a,b)=>(parseDate(b.DATA_AG)?.getTime()||0)-(parseDate(a.DATA_AG)?.getTime()||0));const row=sorted[0];const earliest=col=>group.map(r=>parseDate(r[col])).filter(Boolean).sort((a,b)=>a-b)[0]||null;const latest=col=>group.map(r=>parseDate(r[col])).filter(Boolean).sort((a,b)=>b-a)[0]||null;return {ov,row,created:earliest('Data e hora criadas'),approved:earliest('Data aprovada'),released:latest('DATA_AG')||latest('Data de liberação')}});
+}
+function exRenderFinal(rows,days,by,avg){
+ const daySet=new Set(days),weekNames=['Seg','Ter','Qua','Qui','Sex'],week={};weekNames.forEach(x=>week[x]={total:0,n:0});
+ days.forEach(d=>{const wd=new Date(d+'T12:00:00').getDay(),key=weekNames[wd-1];if(week[key]){week[key].n++;week[key].total+=by[d]||0}});
+ const weekly=weekNames.map(k=>week[k].n?week[k].total/week[k].n:0);
+ exFinalChart('exWeekChart',weekNames,weekly,weekly.map(v=>v<avg*.7?'#D92D20':'#0464FC'));
+ const valid=weekNames.filter(k=>week[k].n),weak=valid.sort((a,b)=>(week[a].total/week[a].n)-(week[b].total/week[b].n))[0];
+ $('exWeekInsight').textContent=weak?`Menor média observada: ${weak} (${(week[weak].total/week[weak].n).toFixed(1).replace('.',',')} OVs/dia). Verificar disponibilidade de demanda, rotinas e feriados antes de concluir que há ociosidade.`:'Não há dias úteis suficientes para comparar.';
+ const all=exFinalEvents(),rowOVs=new Set(rows.map(r=>orderKey(r['Ordem de venda'])).filter(Boolean));
+ const scoped=all.filter(e=>rowOVs.has(e.ov));const created=scoped.filter(e=>e.created).length,approved=scoped.filter(e=>e.approved).length,released=scoped.filter(e=>e.released).length;
+ const n=scoped.length,percent=x=>n?100*x/n:0;
+ exFinalChart('exFunnelChart',['Criação','Aprovação','Liberação'],[percent(created),percent(approved),percent(released)],['#9444FC','#04C4FC','#0464FC'],'percent');
+ $('exFunnelInsight').textContent=`Cobertura entre ${fmtInt(n)} OVs selecionadas: ${fmtInt(n-created)} sem criação, ${fmtInt(n-approved)} sem aprovação e ${fmtInt(n-released)} sem liberação conhecida. Etapas não são necessariamente sequenciais na exportação.`;
+ const validTimes=scoped.map(e=>({...e,lag:e.approved&&e.released?(e.released-e.approved)/86400000:null})).filter(e=>e.lag!==null&&e.lag>=0);
+ const inverted=scoped.filter(e=>e.approved&&e.released&&e.released<e.approved).length;
+ const over2=validTimes.filter(e=>e.lag>2).length,over5=validTimes.filter(e=>e.lag>5).length;
+ const zeros=days.filter(d=>!by[d]).length,low=days.filter(d=>by[d]>0&&by[d]<avg*exStoryLimit/100).length;
+ const pct=(v,total)=>total?(100*v/total).toFixed(1).replace('.',',')+'%':'—';
+ const stats=[['DIAS SEM EVENTO',zeros,'Dias úteis sem liberação registrada'],['ACIMA DE 2 DIAS',over2,'OVs com aprovação e liberação válidas'],['SEM APROVAÇÃO',n-approved,'OVs no recorte sem campo de aprovação']];
+ $('exFinalStats').innerHTML=stats.map(([name,val,note])=>`<div class="pillar"><span>${name}</span><strong>${fmtInt(val)}</strong><span>${note}</span></div>`).join('');
+ const priorities=[];
+ if(zeros)priorities.push(['Investigar dias sem liberação',`${fmtInt(zeros)} dias úteis sem eventos. Conferir feriados, carga disponível, paralisações e atualização da origem.`, 'Prioridade de verificação: cobertura diária']);
+ if(low)priorities.push(['Nivelar o fluxo de liberações',`${fmtInt(low)} dias com atividade abaixo de ${exStoryLimit}% da média. Cruzar com aprovações e recursos escalados antes de redistribuir capacidade.`, 'Prioridade de planejamento']);
+ if(over2)priorities.push(['Revisar OVs com maior intervalo',`${fmtInt(over2)} de ${fmtInt(validTimes.length)} OVs válidas (${pct(over2,validTimes.length)}) excedem 2 dias corridos entre aprovação e liberação. Avaliar etapas e bloqueios.`, 'Prioridade de investigação por OV']);
+ if(n-approved||inverted)priorities.push(['Corrigir qualidade dos registros',`${fmtInt(n-approved)} OVs sem aprovação e ${fmtInt(inverted)} com datas invertidas. Validar mapeamento e atualização para evitar conclusões equivocadas.`, 'Prioridade de confiabilidade']);
+ if(!priorities.length)priorities.push(['Monitorar estabilidade', 'Nenhum dos sinais configurados foi encontrado neste recorte. Manter acompanhamento periódico e revisar as referências conforme o contexto da operação.', 'Acompanhamento']);
+ $('exFinalPriorities').innerHTML=priorities.map(([title,body,tag])=>`<div class="pillar"><strong>${escapeHtml(title)}</strong><div>${escapeHtml(body)}</div><small>${escapeHtml(tag)}</small></div>`).join('');
+ const min=Number($('exFinalMin').value),top=Number($('exFinalTop').value);
+ exFinalCsv=validTimes.filter(e=>e.lag>min).sort((a,b)=>b.lag-a.lag);
+ $('exFinalExceptionBody').innerHTML=exFinalCsv.slice(0,top).map(e=>`<tr><td>${escapeHtml(e.ov)}</td><td>${escapeHtml(e.row.PILAR)}</td><td>${escapeHtml(e.row.CANAL)}</td><td>${escapeHtml(e.row.TIPO_ORDEM)}</td><td>${escapeHtml(dateKey(e.approved))}</td><td>${escapeHtml(dateKey(e.released))}</td><td><b>${e.lag.toFixed(1).replace('.',',')}</b></td></tr>`).join('')||'<tr><td colspan="7" class="empty">Nenhuma OV encontrada com o intervalo escolhido.</td></tr>';
+ $('exFinalExceptionNote').textContent=`${fmtInt(exFinalCsv.length)} OVs acima do limite selecionado; exibindo até ${fmtInt(top)}. Exportação inclui todas as OVs deste recorte. Intervalos em dias corridos, calculados por data e hora disponíveis; não representam tempo líquido de separação.`;
+}
+$('exFinalMin').addEventListener('change',()=>{if(DATA.length)exRenderStory()});
+$('exFinalTop').addEventListener('change',()=>{if(DATA.length)exRenderStory()});
+$('exFinalExport').addEventListener('click',()=>{
+ const fields=['OV','Pilar','Canal','Tipo de ordem','Aprovação','Última liberação','Intervalo (dias corridos)'];
+ const quote=x=>'"'+String(x??'').replace(/"/g,'""')+'"';
+ const lines=[fields,...exFinalCsv.map(e=>[e.ov,e.row.PILAR,e.row.CANAL,e.row.TIPO_ORDEM,dateKey(e.approved),dateKey(e.released),e.lag.toFixed(2).replace('.',',')])];
+ const blob=new Blob(['\ufeff'+lines.map(row=>row.map(quote).join(';')).join('\r\n')],{type:'text/csv;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='diagnostico_ovs_storytelling.csv';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
+});
+
 initializeControls();
 </script>
 </body>
