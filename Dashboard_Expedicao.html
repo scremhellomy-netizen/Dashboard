@@ -102,6 +102,9 @@ table{border-collapse:collapse;width:100%;font-size:12px}th,td{padding:10px 12px
 #exStoryFilters .multi-btn{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 /* Ajustes solicitados: menu de operações acima dos filtros vizinhos e tipografia dos controles gerenciais igual à visão operacional. */
 #operationTypeFilter.open{z-index:30}
+/* Menus multisseleção da Visão operacional acima das demais linhas do grid. */
+.filters .multi-select.open{z-index:100}
+.filters .multi-select.open .multi-menu{z-index:101;pointer-events:auto}
 #exStoryFilters .multi-btn,#exStoryFilters .select{font-size:16px}
 
 @media(max-width:1000px){#exStoryFilters{grid-template-columns:repeat(2,minmax(0,1fr))}}
