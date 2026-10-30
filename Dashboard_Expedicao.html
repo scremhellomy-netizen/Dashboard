@@ -524,7 +524,7 @@ function initializeControls(){
  render();
 }
 // ===== Storytelling gerencial: controles independentes e layout original preservado =====
-const exStoryFields=[['month','Mês','MES_FILTRO'],['pillar','Pilar','PILAR'],['channel','Canal','CANAL'],['type','Tipo de ordem','TIPO_ORDEM'],['status','Status final','STATUS FINAL']];
+const exStoryFields=[['month','Mês','MES_FILTRO'],['pillar','Pilar','PILAR'],['channel','Canal','CANAL'],['type','Tipo de ordem','TIPO_ORDEM'],['department','Departamento','DEPARTAMENTO'],['status','Status final','STATUS FINAL']];
 const exStorySelected={};let exStoryRange='';let exStoryLimit=70;
 function exBuildFilters(){
  const holder=$('exStoryFilters');holder.innerHTML=exStoryFields.map(([id,label])=>`<div class="multi-select" id="exf-${id}"><button class="multi-btn" type="button" id="exb-${id}">Todos · ${label}</button><div class="multi-menu"><div class="multi-actions"><button type="button" data-action="all">Selecionar todos</button><button type="button" data-action="clear">Limpar</button></div><div id="exo-${id}"></div></div></div>`).join('')+`<div><select class="select" id="exPeriod"><option value="">Período completo</option><option value="30">Últimos 30 dias</option><option value="60">Últimos 60 dias</option><option value="90">Últimos 90 dias</option></select></div><div><select class="select" id="exThreshold"><option value="70">Abaixo de 70%</option><option value="80">Abaixo de 80%</option><option value="50">Abaixo de 50%</option></select></div>`;
