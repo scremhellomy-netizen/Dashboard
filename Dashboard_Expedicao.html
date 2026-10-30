@@ -123,6 +123,13 @@ table{border-collapse:collapse;width:100%;font-size:12px}th,td{padding:10px 12px
 
 <div class="filters">
   <select class="select" id="orderType"><option value="">Todos os tipos de ordem</option></select>
+  <div class="multi-select" id="operationTypeFilter">
+    <button type="button" class="multi-btn" id="operationTypeBtn">Todos · Tipo de operação</button>
+    <div class="multi-menu">
+      <div class="multi-actions"><button type="button" id="operationTypeAll">Selecionar todos</button><button type="button" id="operationTypeClear">Limpar</button></div>
+      <div id="operationTypeOptions"></div>
+    </div>
+  </div>
   <select class="select" id="status"><option value="">Todos os status</option></select>
   <select class="select" id="channel"><option value="">Todos os canais</option></select>
   <select class="select" id="area"><option value="">Todas as áreas</option></select>
@@ -325,6 +332,24 @@ function fillExtraStatusFilter(prefix,col,label){
  box.querySelectorAll('input[type="checkbox"]').forEach(el=>el.addEventListener("change",()=>{updateExtraStatusButton(prefix,label);render()}));
  updateExtraStatusButton(prefix,label);
 }
+// Filtro multisseleção exclusivo para Tipo de operação de venda.
+const operationTypeField="Tipo de operação de venda";
+function selectedOperationTypes(){return [...document.querySelectorAll('#operationTypeOptions input:checked')].map(x=>x.value)}
+function operationTypeButton(){const n=selectedOperationTypes().length;$('operationTypeBtn').textContent=n?`${n} tipo${n>1?'s':''} de operação selecionado${n>1?'s':''}`:'Todos · Tipo de operação'}
+function fillOperationTypeFilter(){
+ const selected=new Set(selectedOperationTypes()),box=$('operationTypeOptions');
+ const values=unique(operationTypeField);
+ box.innerHTML=values.map(v=>`<label class="multi-option"><input type="checkbox" value="${escapeHtml(v)}" ${selected.has(v)?'checked':''}> <span>${escapeHtml(v)}</span></label>`).join('');
+ box.querySelectorAll('input').forEach(x=>x.addEventListener('change',()=>{operationTypeButton();render()}));
+ operationTypeButton();
+}
+function setupOperationTypeFilter(){
+ const wrap=$('operationTypeFilter'),box=$('operationTypeOptions');
+ $('operationTypeBtn').addEventListener('click',e=>{e.stopPropagation();wrap.classList.toggle('open')});
+ document.addEventListener('click',e=>{if(!wrap.contains(e.target))wrap.classList.remove('open')});
+ $('operationTypeAll').addEventListener('click',()=>{box.querySelectorAll('input').forEach(x=>x.checked=true);operationTypeButton();render()});
+ $('operationTypeClear').addEventListener('click',()=>{box.querySelectorAll('input').forEach(x=>x.checked=false);operationTypeButton();render()});
+}
 function orderKey(v){return norm(v).toUpperCase().replace(/\s+/g,"")}
 function extraStatus(r,key){return norm(r[key])}
 function splitValues(v){return norm(v).split(" | ").map(x=>x.trim()).filter(Boolean)}
@@ -368,10 +393,10 @@ function renderTickets(){
 }
 let filtered=DATA, charts={};
 function getFiltered(){
- const t=$("orderType").value,s=$("status").value,c=$("channel").value,a=$("area").value,dc=$("deliveryCondition").value,ci=$("customItems").value,dep=$("department").value,ag=selectedExtraStatuses("agendamento"),cs=selectedExtraStatuses("chamado"),consideration=$("consideracaoChamado").value,m=$("month").value,q=norm($("search").value).toLowerCase(),ds=getSelectedDocStatuses();
+ const operations=selectedOperationTypes(),t=$("orderType").value,s=$("status").value,c=$("channel").value,a=$("area").value,dc=$("deliveryCondition").value,ci=$("customItems").value,dep=$("department").value,ag=selectedExtraStatuses("agendamento"),cs=selectedExtraStatuses("chamado"),consideration=$("consideracaoChamado").value,m=$("month").value,q=norm($("search").value).toLowerCase(),ds=getSelectedDocStatuses();
  const consideredOVs=consideration?new Set(CHAMADOS.filter(ch=>ticketConsideration(ch)===consideration).map(ch=>orderKey(ch.ov)).filter(Boolean)):null;
  return DATA.filter(r=>
-   (!t||norm(r.TIPO_ORDEM)===t)&&(!s||norm(r["STATUS FINAL"])===s)&&(!c||norm(r.CANAL)===c)&&(!a||norm(r["ÁREA"])===a)&&(!dc||norm(r["Condições de entrega"])===dc)&&(!ci||norm(r["Possui Itens Customizados"])===ci)&&(!dep||norm(r["DEPARTAMENTO"])===dep)&&(!ag.length||ag.some(v=>splitValues(extraStatus(r,"AGENDAMENTO_STATUS")).includes(v)))&&(!cs.length||cs.some(v=>splitValues(extraStatus(r,"CHAMADO_TIPO")).includes(v)))&&(!consideration||consideredOVs.has(orderKey(r["Ordem de venda"])))&&(!m||norm(r.MES_FILTRO)===m)&&(ds.length===0||ds.includes(norm(r["Status do documento"])))&&
+   (!operations.length||operations.includes(norm(r[operationTypeField])))&&(!t||norm(r.TIPO_ORDEM)===t)&&(!s||norm(r["STATUS FINAL"])===s)&&(!c||norm(r.CANAL)===c)&&(!a||norm(r["ÁREA"])===a)&&(!dc||norm(r["Condições de entrega"])===dc)&&(!ci||norm(r["Possui Itens Customizados"])===ci)&&(!dep||norm(r["DEPARTAMENTO"])===dep)&&(!ag.length||ag.some(v=>splitValues(extraStatus(r,"AGENDAMENTO_STATUS")).includes(v)))&&(!cs.length||cs.some(v=>splitValues(extraStatus(r,"CHAMADO_TIPO")).includes(v)))&&(!consideration||consideredOVs.has(orderKey(r["Ordem de venda"])))&&(!m||norm(r.MES_FILTRO)===m)&&(ds.length===0||ds.includes(norm(r["Status do documento"])))&&
    (!q||[r["Ordem de venda"],r.Nome,r["Número de Série do Equipamento"],r["Referência de cliente"]].some(x=>norm(x).toLowerCase().includes(q)))
  )
 }
@@ -492,6 +517,7 @@ async function fetchDashboardData(){
   $("lastUpdate").textContent=updatedAt?`Última atualização: ${safeFileDate(updatedAt)}`:"Última atualização: não informada";
   rebuildMonthOptions();
   fillSelect("orderType","TIPO_ORDEM","Todos os tipos de ordem");
+  fillOperationTypeFilter();
   fillSelect("status","STATUS FINAL","Todos os status");
   fillSelect("channel","CANAL","Todos os canais");
   fillSelect("area","ÁREA","Todas as áreas");
@@ -516,12 +542,14 @@ setTimeout(fetchDashboardData,100);
 
 function initializeControls(){
  fillSelect("orderType","TIPO_ORDEM","Todos os tipos de ordem");
+ fillOperationTypeFilter();
  fillSelect("status","STATUS FINAL","Todos os status");
  fillSelect("channel","CANAL","Todos os canais");
  fillSelect("area","ÁREA","Todas as áreas");fillSelect("deliveryCondition","Condições de entrega","Todas as condições de entrega");fillSelect("customItems","Possui Itens Customizados","Todos os itens customizados");fillSelect("department","DEPARTAMENTO","Todos os departamentos");
  fillExtraStatusFilter("agendamento","AGENDAMENTO_STATUS","Todos os status de agendamento");fillExtraStatusFilter("chamado","CHAMADO_TIPO","Todos os status chamado");
  rebuildMonthOptions();
  setupDocStatusFilter();
+ setupOperationTypeFilter();
  setupExtraStatusFilter("agendamento","AGENDAMENTO_STATUS","Todos os status de agendamento");
  setupExtraStatusFilter("chamado","CHAMADO_TIPO","Todos os status chamado");
  ["orderType","status","channel","area","deliveryCondition","customItems","department","consideracaoChamado","month"].forEach(id=>$(id).addEventListener("change",render));
@@ -532,7 +560,7 @@ function initializeControls(){
  render();
 }
 // ===== Storytelling gerencial: controles independentes e layout original preservado =====
-const exStoryFields=[['month','Mês','MES_FILTRO'],['pillar','Pilar','PILAR'],['channel','Canal','CANAL'],['type','Tipo de ordem','TIPO_ORDEM'],['department','Departamento','DEPARTAMENTO'],['status','Status final','STATUS FINAL']];
+const exStoryFields=[['month','Mês','MES_FILTRO'],['operation','Tipo de operação','Tipo de operação de venda'],['pillar','Pilar','PILAR'],['channel','Canal','CANAL'],['type','Tipo de ordem','TIPO_ORDEM'],['department','Departamento','DEPARTAMENTO'],['status','Status final','STATUS FINAL']];
 const exStorySelected={};let exStoryRange='';let exStoryLimit=70;
 function exBuildFilters(){
  const holder=$('exStoryFilters');holder.innerHTML=exStoryFields.map(([id,label])=>`<div class="multi-select" id="exf-${id}"><button class="multi-btn" type="button" id="exb-${id}">Todos · ${label}</button><div class="multi-menu"><div class="multi-actions"><button type="button" data-action="all">Selecionar todos</button><button type="button" data-action="clear">Limpar</button></div><div id="exo-${id}"></div></div></div>`).join('')+`<div><select class="select" id="exPeriod"><option value="">Período completo</option><option value="30">Últimos 30 dias</option><option value="60">Últimos 60 dias</option><option value="90">Últimos 90 dias</option></select></div><div><select class="select" id="exThreshold"><option value="70">Abaixo de 70%</option><option value="80">Abaixo de 80%</option><option value="50">Abaixo de 50%</option></select></div>`;
