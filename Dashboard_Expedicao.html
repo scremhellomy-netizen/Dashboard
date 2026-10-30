@@ -101,6 +101,7 @@ table{border-collapse:collapse;width:100%;font-size:12px}th,td{padding:10px 12px
 #exStoryFilters .multi-btn,#exStoryFilters .select{display:block;width:100%;height:40px;min-height:40px;max-width:100%;box-sizing:border-box;padding:9px 12px;font:inherit;font-size:13px;line-height:20px;border-radius:10px}
 #exStoryFilters .multi-btn{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 /* Ajustes solicitados: menu de operações acima dos filtros vizinhos e tipografia dos controles gerenciais igual à visão operacional. */
+#exStory .chart-title{font-size:14px;font-weight:800;font-family:Inter,Segoe UI,Arial,sans-serif}
 #operationTypeFilter.open{z-index:30}
 /* Menus multisseleção da Visão operacional acima das demais linhas do grid. */
 .filters .multi-select.open{z-index:100}
@@ -799,9 +800,9 @@ function exRenderFinal(rows,days,by,avg){
  $('exFinalExceptionBody').innerHTML=exFinalCsv.slice(0,top).map(e=>`<tr><td>${escapeHtml(e.ov)}</td><td>${escapeHtml(e.row.PILAR)}</td><td>${escapeHtml(e.row.CANAL)}</td><td>${escapeHtml(e.row.TIPO_ORDEM)}</td><td>${escapeHtml(dateKey(e.approved))}</td><td>${escapeHtml(dateKey(e.released))}</td><td><b>${e.lag.toFixed(1).replace('.',',')}</b></td></tr>`).join('')||'<tr><td colspan="7" class="empty">Nenhuma OV encontrada com o intervalo escolhido.</td></tr>';
  $('exFinalExceptionNote').textContent=`${fmtInt(exFinalCsv.length)} OVs acima do limite selecionado; exibindo até ${fmtInt(top)}. Exportação inclui todas as OVs deste recorte. Intervalos em dias corridos, calculados por data e hora disponíveis; não representam tempo líquido de separação.`;
 }
-$('exFinalMin').addEventListener('change',()=>{if(DATA.length)exRenderStory()});
-$('exFinalTop').addEventListener('change',()=>{if(DATA.length)exRenderStory()});
-$('exFinalExport').addEventListener('click',()=>{
+if($('exFinalMin'))$('exFinalMin').addEventListener('change',()=>{if(DATA.length)exRenderStory()});
+if($('exFinalTop'))$('exFinalTop').addEventListener('change',()=>{if(DATA.length)exRenderStory()});
+if($('exFinalExport'))$('exFinalExport').addEventListener('click',()=>{
  const fields=['OV','Pilar','Canal','Tipo de ordem','Aprovação','Última liberação','Intervalo (dias corridos)'];
  const quote=x=>'"'+String(x??'').replace(/"/g,'""')+'"';
  const lines=[fields,...exFinalCsv.map(e=>[e.ov,e.row.PILAR,e.row.CANAL,e.row.TIPO_ORDEM,dateKey(e.approved),dateKey(e.released),e.lag.toFixed(2).replace('.',',')])];
