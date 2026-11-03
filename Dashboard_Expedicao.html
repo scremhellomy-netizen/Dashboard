@@ -119,6 +119,11 @@ table{border-collapse:collapse;width:100%;font-size:12px}th,td{padding:10px 12px
 .ex-timing-cards .pillar-metrics{margin-top:7px}
 @media(max-width:1000px){.ex-timing-cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:600px){.ex-timing-cards{grid-template-columns:1fr}}
+
+/* Alinhamento exclusivo dos filtros gerenciais: datas ocupam a mesma altura dos demais controles. */
+#exStoryFilters > div:has(> input[type="date"]){position:relative;height:40px;min-height:40px}
+#exStoryFilters > div:has(> input[type="date"]) > label{position:absolute;left:12px;top:3px;font-size:9px;line-height:11px;z-index:1;pointer-events:none}
+#exStoryFilters > div > input[type="date"].select{height:40px;min-height:40px;padding:15px 12px 3px;line-height:18px}
 </style>
 </head>
 <body data-theme="dark">
