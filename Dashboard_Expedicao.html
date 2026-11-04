@@ -740,11 +740,11 @@ function exCapacityDrawDaily(days,volumes){
  const L=53,R=22,T=64,B=55,pw=w-L-R,ph=h-T-B,peak=Math.max(220,...days.map(d=>volumes[d]||0))*1.22;
  ctx.font='11px Segoe UI';ctx.strokeStyle=border;ctx.fillStyle=muted;ctx.textAlign='left';
  for(let j=0;j<=4;j++){const y=T+j*ph/4;ctx.beginPath();ctx.moveTo(L,y);ctx.lineTo(w-R,y);ctx.stroke();ctx.fillText(fmtInt(peak*(1-j/4)),3,y+4)}
- const bw=Math.min(24,pw/days.length*.67),labelStep=Math.max(1,Math.ceil(days.length/18));
+ const bw=Math.min(24,pw/days.length*.67);
  days.forEach((day,i)=>{
   const v=volumes[day]||0,x=L+(i+.5)*pw/days.length,y=T+ph-v/peak*ph;
   ctx.fillStyle='#0464FC';ctx.fillRect(x-bw/2,y,bw,Math.max(1,T+ph-y));
-  if(i%labelStep===0||i===days.length-1){ctx.fillStyle=muted;ctx.textAlign='center';ctx.font='10px Segoe UI';ctx.fillText(day.slice(8),x,h-22)}
+  {ctx.fillStyle=muted;ctx.textAlign='center';ctx.font=(pw/days.length<24?'9px Segoe UI':'10px Segoe UI');ctx.fillText(day.slice(8),x,h-22)}
   // Rótulo de volume em todas as colunas; diferença acima da seta, sem omissões.
   const delta=v-200,arrowY=Math.max(34,y-20),volumeY=Math.max(57,y-5);
   ctx.textAlign='center';ctx.font='bold 10px Segoe UI';ctx.fillStyle=ink;ctx.fillText(fmtInt(v),x,volumeY);
@@ -769,7 +769,7 @@ function exCapacityDrawProjection(days,values,cutoff,scenarios){
  function line(arr,color,dashed,start=0,end=arr.length-1){ctx.strokeStyle=color;ctx.lineWidth=2.5;ctx.setLineDash(dashed?[6,5]:[]);ctx.beginPath();let started=false;for(let i=start;i<=end;i++){if(!Number.isFinite(arr[i]))continue;const x=xAt(i),y=yAt(arr[i]);if(!started){ctx.moveTo(x,y);started=true}else ctx.lineTo(x,y)}ctx.stroke();ctx.setLineDash([])}
  line(values,'#0464FC',false,0,cutoff);
  for(const [key,color] of [['base','#9444FC'],['low','#D92D20'],['high','#16a34a']])line(scenarios[key],color,true,cutoff,days.length-1);
- const step=Math.max(1,Math.ceil(days.length/12));days.forEach((day,i)=>{if(i%step===0||i===days.length-1){ctx.fillStyle=muted;ctx.textAlign='center';ctx.fillText(day.slice(8),xAt(i),h-17)}});
+ days.forEach((day,i)=>{ctx.fillStyle=muted;ctx.textAlign='center';ctx.font=(pw/Math.max(1,days.length-1)<24?'9px Segoe UI':'10px Segoe UI');ctx.fillText(day.slice(8),xAt(i),h-17)});
  // Rótulos em todos os pontos realizados; nas projeções, rótulos por cenário
  // e totais finais, com deslocamento para distinguir linhas próximas.
  ctx.textAlign='center';ctx.font='bold 9px Segoe UI';
