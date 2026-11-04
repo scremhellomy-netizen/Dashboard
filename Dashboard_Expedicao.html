@@ -144,6 +144,11 @@ table{border-collapse:collapse;width:100%;font-size:12px}th,td{padding:10px 12px
 .ex-cap-pillars .ex-insight-card strong{font-size:19px}
 .ex-cap-pillars .ex-pillar-stat{font-size:12px;color:var(--muted);margin-top:5px}
 .ex-cap-pillars .ex-pillar-stat b{color:var(--text)}
+/* Identidade cromática dos pilares, restrita aos cards do Storytelling. */
+.ex-cap-pillars .ex-insight-card{background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:13px}
+.ex-cap-pillars .ex-pillar-name{color:var(--text);font-size:12px;font-weight:800}
+.ex-cap-pillars .ex-pillar-bar{height:7px;border-radius:8px;background:var(--border);margin-top:10px;overflow:hidden}
+.ex-cap-pillars .ex-pillar-fill{height:100%;border-radius:8px;background:var(--pillar-color)}
 </style>
 </head>
 <body data-theme="dark">
@@ -829,9 +834,11 @@ function exRenderCapacity(){
   g.volume+=qty;allVolume+=qty;
  });
  const percent=(part,total)=>total?(part*100/total).toFixed(1).replace('.',',')+'%':'0,0%';
- pillarCards.innerHTML=[...pillarGroups.entries()].sort((a,b)=>b[1].volume-a[1].volume).map(([name,g])=>
-  `<div class="ex-insight-card"><span>PILAR · ${escapeHtml(name)}</span><strong>${fmtInt(g.orders.size)} pedidos</strong><div class="ex-pillar-stat"><b>${fmtInt(g.volume)}</b> volumes · <b>${percent(g.volume,allVolume)}</b> do volume</div><div class="ex-pillar-stat">Representatividade em pedidos: <b>${percent(g.orders.size,allOrders.size)}</b></div></div>`
- ).join('')||'<div class="ex-insight-card">Sem dados de pilar no mês analisado.</div>';
+ pillarCards.innerHTML=[...pillarGroups.entries()].sort((a,b)=>b[1].volume-a[1].volume).map(([name,g])=>{
+  const color=COLORS[name.toUpperCase()]||'#0464FC';
+  const width=allVolume?Math.max(0,Math.min(100,g.volume/allVolume*100)):0;
+  return `<div class="ex-insight-card" style="--pillar-color:${color}"><span class="ex-pillar-name">PILAR · ${escapeHtml(name)}</span><strong>${fmtInt(g.orders.size)} pedidos</strong><div class="ex-pillar-stat"><b>${fmtInt(g.volume)}</b> volumes · <b>${percent(g.volume,allVolume)}</b> do volume</div><div class="ex-pillar-stat">Representatividade em pedidos: <b>${percent(g.orders.size,allOrders.size)}</b></div><div class="ex-pillar-bar"><div class="ex-pillar-fill" style="width:${width}%"></div></div></div>`;
+ }).join('')||'<div class="ex-insight-card">Sem dados de pilar no mês analisado.</div>';
 
  const total=historyDays.reduce((a,d)=>a+(volumes[d]||0),0),mean=historyDays.length?total/historyDays.length:0;
  const deficits=historyDays.reduce((a,d)=>a+Math.max(0,meta-(volumes[d]||0)),0),surpluses=historyDays.reduce((a,d)=>a+Math.max(0,(volumes[d]||0)-meta),0);
