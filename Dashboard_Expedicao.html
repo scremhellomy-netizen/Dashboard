@@ -124,6 +124,19 @@ table{border-collapse:collapse;width:100%;font-size:12px}th,td{padding:10px 12px
 #exStoryFilters > div:has(> input[type="date"]){position:relative;height:40px;min-height:40px}
 #exStoryFilters > div:has(> input[type="date"]) > label{position:absolute;left:12px;top:3px;font-size:9px;line-height:11px;z-index:1;pointer-events:none}
 #exStoryFilters > div > input[type="date"].select{height:40px;min-height:40px;padding:15px 12px 3px;line-height:18px}
+
+/* Novo painel exclusivo do Storytelling: capacidade de separação */
+.ex-cap-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:14px 0}
+.ex-cap-kpis .ex-insight-card{min-width:0}
+.ex-cap-kpis .ex-insight-card strong{font-size:19px}
+.ex-cap-chart{width:100%;display:block;height:340px}
+.ex-cap-proj{width:100%;display:block;height:270px}
+.ex-cap-subtitle{font-size:12px;color:var(--muted);margin:8px 0 12px}
+.ex-cap-legend{display:flex;flex-wrap:wrap;gap:15px;margin:8px 0 14px;font-size:12px;color:var(--muted)}
+.ex-cap-legend i{display:inline-block;width:20px;vertical-align:middle;margin-right:6px;border-top:3px solid #0464FC}
+.ex-cap-legend .cap-goal{border-top:3px dashed #04C4FC}.ex-cap-legend .cap-low{border-color:#D92D20}.ex-cap-legend .cap-high{border-color:#16a34a}.ex-cap-legend .cap-mid{border-color:#9444FC}
+@media(max-width:1000px){.ex-cap-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){.ex-cap-kpis{grid-template-columns:1fr}}
 </style>
 </head>
 <body data-theme="dark">
@@ -238,7 +251,21 @@ table{border-collapse:collapse;width:100%;font-size:12px}th,td{padding:10px 12px
  <div class="chart-title">Filtros da análise gerencial</div><div class="chart-sub">Seleção múltipla independente dos filtros da visão operacional</div><div class="ex-story-filters" id="exStoryFilters"></div><div style="margin-bottom:18px"><button class="btn" type="button" id="exStoryClear">Limpar todos os filtros</button></div>
  <div class="ex-story-kpis" id="exStoryKpis"></div>
  <div class="card chart-card ex-story-chart"><div class="chart-title">Pedidos únicos liberados × média diária</div><div class="chart-sub">Última liberação conhecida por OV · média por dia útil · linha tracejada = média</div><canvas id="exStoryChart"></canvas><div class="ex-story-legend"><span><i class="ex-legend-swatch" style="background:#0464FC"></i>Liberados</span><span><i class="ex-legend-swatch" style="background:#D92D20"></i>Abaixo do limite</span><span><i class="ex-legend-swatch" style="background:#F79009"></i>Dia útil sem liberação</span><span><i class="ex-legend-line"></i>Média diária</span></div></div>
-   <div class="card chart-card" style="margin-bottom:16px" id="exCreationTimingPanel"><div class="chart-title">Tempo de resposta · criação × liberação efetiva</div><div class="chart-sub">Criação (H) até envio/liberação (AI) · pedidos únicos e volumes</div><div class="ex-timing-cards" id="exCreationTimingCards"></div></div>
+  
+ <div class="card chart-card" style="margin-bottom:16px" id="exCapacityPanel">
+  <div class="chart-title">Capacidade de separação · volumes liberados × meta diária</div>
+  <div class="chart-sub">Volume = soma da coluna K por Data de envio (AI) · meta de 200 volumes/dia útil · análise do mês mais recente do recorte gerencial</div>
+  <div class="ex-cap-kpis" id="exCapacityKpis"></div>
+  <canvas class="ex-cap-chart" id="exCapacityChart" aria-label="Volumes liberados por dia útil e linha de meta 200"></canvas>
+  <div class="ex-cap-legend"><span><i></i>Volumes liberados</span><span><i class="cap-goal"></i>Meta: 200</span><span style="color:#D92D20">▼ Abaixo da meta</span><span style="color:#16a34a">▲ Acima da meta</span></div>
+  <div class="chart-title" style="margin-top:16px">Projeção de fechamento · acumulado de volumes</div>
+  <div class="ex-cap-subtitle" id="exCapacityForecastNote"></div>
+  <canvas class="ex-cap-proj" id="exCapacityProjection" aria-label="Acumulado realizado e três cenários de projeção até o fechamento do mês"></canvas>
+  <div class="ex-cap-legend"><span><i></i>Acumulado realizado</span><span><i class="cap-mid"></i>Média atual</span><span><i class="cap-low"></i>Cenário abaixo da meta</span><span><i class="cap-high"></i>Cenário acima da meta</span></div>
+  <div class="ex-insight-grid" id="exCapacityInsights"></div>
+  <div class="ex-segment-note">A diferença para a meta representa capacidade não utilizada em volumes, <b>não comprova ociosidade de colaboradores</b>. Dias sem registros podem refletir feriados, ausência de demanda ou falhas na origem. Dias úteis consideram segunda a sexta, sem exclusão automática de feriados. Projeções são cenários matemáticos, não previsões garantidas.</div>
+ </div>
+ <div class="card chart-card" style="margin-bottom:16px" id="exCreationTimingPanel"><div class="chart-title">Tempo de resposta · criação × liberação efetiva</div><div class="chart-sub">Criação (H) até envio/liberação (AI) · pedidos únicos e volumes</div><div class="ex-timing-cards" id="exCreationTimingCards"></div></div>
 <div class="card chart-card" style="margin-bottom:16px"><div class="chart-title">Prazo entre liberação e faturamento</div><div class="chart-sub">Data de envio (AI) × Data (Q) · pedidos únicos e volumes</div><div class="ex-timing-cards" id="exBillingTimingCards"></div></div>
  <div class="card chart-card" style="margin-bottom:16px"><div class="chart-title">Prazo entre liberação e expedição</div><div class="chart-sub">Data de envio (AI) × Expedido (S) · pedidos únicos e volumes</div><div class="ex-timing-cards" id="exShippingTimingCards"></div></div>
  <div class="card chart-card" style="margin-bottom:16px"><div class="chart-title">Narrativa gerencial e alertas</div><div id="exStoryNarrative"></div></div>
@@ -698,9 +725,88 @@ function exRenderTimingCards(rows){
  $(id).innerHTML=buckets.map((v,i)=>`<div class="pillar" style="--timing-color:${colors[i]}"><div class="pillar-top">${names[i]}</div><div class="timing-number">${fmtInt(v.orders)}</div><div class="pillar-metrics">pedidos únicos · ${total?(100*v.orders/total).toFixed(1).replace('.',','):'0'}%</div><div class="pillar-metrics"><b>${fmtInt(v.qty)}</b> volumes</div></div>`).join('')+`<div class="ex-segment-note" style="grid-column:1/-1"><b>Leitura operacional:</b> ${fmtInt(fast)} de ${fmtInt(total)} pedidos (${total?(100*fast/total).toFixed(1).replace('.',','):'0'}%) concluídos em até 1 dia; ${fmtInt(late)} pedidos acima de 3 dias. ${fmtInt(missing)} sem datas completas ou com sequência invertida, não contabilizados. Faixas exclusivas em dias corridos.</div>`;
  }
 }
+
+// Painel adicional de capacidade: não modifica séries ou cálculos existentes.
+function exCapacityCanvas(id,height){
+ const canvas=$(id),width=Math.max(360,canvas.clientWidth||600),dpr=window.devicePixelRatio||1;
+ canvas.width=Math.round(width*dpr);canvas.height=Math.round(height*dpr);
+ const ctx=canvas.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);
+ const css=getComputedStyle(document.body);
+ return {ctx,w:width,h:height,ink:css.getPropertyValue('--text').trim(),muted:css.getPropertyValue('--muted').trim(),border:css.getPropertyValue('--border').trim()};
+}
+function exCapacityDrawDaily(days,volumes){
+ const {ctx,w,h,ink,muted,border}=exCapacityCanvas('exCapacityChart',340);
+ if(!days.length){ctx.fillStyle=muted;ctx.fillText('Sem dados no período selecionado.',20,30);return}
+ const L=53,R=22,T=37,B=55,pw=w-L-R,ph=h-T-B,peak=Math.max(220,...days.map(d=>volumes[d]||0))*1.22;
+ ctx.font='11px Segoe UI';ctx.strokeStyle=border;ctx.fillStyle=muted;ctx.textAlign='left';
+ for(let j=0;j<=4;j++){const y=T+j*ph/4;ctx.beginPath();ctx.moveTo(L,y);ctx.lineTo(w-R,y);ctx.stroke();ctx.fillText(fmtInt(peak*(1-j/4)),3,y+4)}
+ const bw=Math.min(24,pw/days.length*.67),labelStep=Math.max(1,Math.ceil(days.length/18));
+ days.forEach((day,i)=>{
+  const v=volumes[day]||0,x=L+(i+.5)*pw/days.length,y=T+ph-v/peak*ph;
+  ctx.fillStyle='#0464FC';ctx.fillRect(x-bw/2,y,bw,Math.max(1,T+ph-y));
+  if(i%labelStep===0||i===days.length-1){ctx.fillStyle=muted;ctx.textAlign='center';ctx.font='10px Segoe UI';ctx.fillText(day.slice(8),x,h-22)}
+  if(v!==200){ctx.fillStyle=v>200?'#16a34a':'#D92D20';ctx.font='bold 13px Segoe UI';ctx.textAlign='center';ctx.fillText(v>200?'▲':'▼',x,Math.max(16,y-17))}
+  if(days.length<=18||i%labelStep===0||i===days.length-1){ctx.fillStyle=ink;ctx.font='bold 10px Segoe UI';ctx.textAlign='center';ctx.fillText(fmtInt(v),x,Math.max(29,y-5))}
+ });
+ const yGoal=T+ph-200/peak*ph;ctx.strokeStyle='#04C4FC';ctx.lineWidth=2;ctx.setLineDash([7,5]);ctx.beginPath();ctx.moveTo(L,yGoal);ctx.lineTo(w-R,yGoal);ctx.stroke();ctx.setLineDash([]);
+ ctx.fillStyle=ink;ctx.textAlign='right';ctx.font='bold 11px Segoe UI';ctx.fillText('200',w-R,Math.max(12,yGoal-7));
+ const canvas=$('exCapacityChart');canvas.onmousemove=e=>{const x=e.clientX-canvas.getBoundingClientRect().left,i=Math.floor((x-L)/pw*days.length);if(i>=0&&i<days.length){const v=volumes[days[i]]||0;canvas.title=days[i].split('-').reverse().join('/')+' · '+fmtInt(v)+' volumes · '+(v<200?'faltam '+fmtInt(200-v):v>200?'sobram '+fmtInt(v-200):'meta atingida')}else canvas.title=''};
+}
+function exCapacityDrawProjection(days,values,cutoff,scenarios){
+ const {ctx,w,h,ink,muted,border}=exCapacityCanvas('exCapacityProjection',270);
+ if(!days.length)return;
+ const L=57,R=23,T=24,B=43,pw=w-L-R,ph=h-T-B,peak=Math.max(200,...Object.values(scenarios).flat(),...values)*1.15||1;
+ ctx.font='10px Segoe UI';ctx.fillStyle=muted;ctx.strokeStyle=border;
+ for(let j=0;j<=4;j++){const y=T+j*ph/4;ctx.beginPath();ctx.moveTo(L,y);ctx.lineTo(w-R,y);ctx.stroke();ctx.fillText(fmtInt(peak*(1-j/4)),3,y+4)}
+ const xAt=i=>L+(days.length===1?0:i/(days.length-1))*pw,yAt=v=>T+ph-v/peak*ph;
+ function line(arr,color,dashed,start=0,end=arr.length-1){ctx.strokeStyle=color;ctx.lineWidth=2.5;ctx.setLineDash(dashed?[6,5]:[]);ctx.beginPath();let started=false;for(let i=start;i<=end;i++){if(arr[i]===null||arr[i]===undefined)continue;const x=xAt(i),y=yAt(arr[i]);if(!started){ctx.moveTo(x,y);started=true}else ctx.lineTo(x,y)}ctx.stroke();ctx.setLineDash([])}
+ line(values,'#0464FC',false,0,cutoff);
+ for(const [key,color] of [['base','#9444FC'],['low','#D92D20'],['high','#16a34a']])line(scenarios[key],color,true,cutoff,days.length-1);
+ const step=Math.max(1,Math.ceil(days.length/12));days.forEach((day,i)=>{if(i%step===0||i===days.length-1){ctx.fillStyle=muted;ctx.textAlign='center';ctx.fillText(day.slice(8),xAt(i),h-17)}});
+ ctx.fillStyle=ink;ctx.textAlign='right';ctx.font='bold 10px Segoe UI';for(const [key,color] of [['base','#9444FC'],['low','#D92D20'],['high','#16a34a']]){if(cutoff<days.length-1){ctx.fillStyle=color;ctx.fillText(fmtInt(scenarios[key].at(-1)),w-R,Math.max(12,yAt(scenarios[key].at(-1))-5))}}
+}
+function exRenderCapacity(){
+ const meta=200,today=dateKey(new Date());
+ const rows=DATA.filter(r=>{
+  const d=dateKey(r['Data de envio']);if(!d||d>today)return false;
+  if($('exDateStart').value&&d<$('exDateStart').value)return false;
+  if($('exDateEnd').value&&d>$('exDateEnd').value)return false;
+  return exStoryFields.every(([id,label,col])=>{
+   if(id==='month')return !exStorySelected[id].size||exStorySelected[id].has(d.slice(0,7));
+   return !exStorySelected[id].size||exStorySelected[id].has(norm(r[col]));
+  });
+ });
+ const allDays=rows.map(r=>dateKey(r['Data de envio'])).sort(),latest=allDays.at(-1);
+ const cards=$('exCapacityKpis'),notes=$('exCapacityForecastNote'),insights=$('exCapacityInsights');
+ if(!latest){cards.innerHTML='<div class="ex-insight-card">Sem volumes com Data de envio (AI) para os filtros selecionados.</div>';notes.textContent='';insights.innerHTML='';exCapacityCanvas('exCapacityChart',340);exCapacityCanvas('exCapacityProjection',270);return}
+ // A visualização trabalha com um único mês, evitando projeções incoerentes entre meses.
+ const month=latest.slice(0,7),monthEnd=dateKey(new Date(Number(month.slice(0,4)),Number(month.slice(5,7)),0));
+ const requestedEnd=$('exDateEnd').value||today,cutDate=[monthEnd,requestedEnd,today].sort()[0];
+ const startDate=$('exDateStart').value&&$('exDateStart').value>month+'-01'?$('exDateStart').value:month+'-01';
+ const historyDays=exWeekdays(startDate,cutDate),monthDays=exWeekdays(month+'-01',monthEnd),futureDays=monthDays.filter(d=>d>cutDate);
+ const volumes={};rows.forEach(r=>{const d=dateKey(r['Data de envio']);if(d.startsWith(month))volumes[d]=(volumes[d]||0)+toNumber(r.Quantidade)});
+ const total=historyDays.reduce((a,d)=>a+(volumes[d]||0),0),mean=historyDays.length?total/historyDays.length:0;
+ const deficits=historyDays.reduce((a,d)=>a+Math.max(0,meta-(volumes[d]||0)),0),surpluses=historyDays.reduce((a,d)=>a+Math.max(0,(volumes[d]||0)-meta),0);
+ const below=historyDays.filter(d=>(volumes[d]||0)<meta),above=historyDays.filter(d=>(volumes[d]||0)>meta);
+ const n=v=>fmtInt(Math.round(v)),f=v=>v.toFixed(1).replace('.',',');
+ cards.innerHTML=[['META / DIA ÚTIL',n(meta),'Volumes de referência'],['MÉDIA REALIZADA',f(mean),'Volumes por dia útil'],['CAPACIDADE NÃO UTILIZADA',n(deficits),below.length+' dias abaixo de 200'],['EXCEDENTE À META',n(surpluses),above.length+' dias acima de 200']].map(([label,value,desc])=>`<div class="ex-insight-card"><span>${label}</span><strong>${value}</strong><span>${desc}</span></div>`).join('');
+ exCapacityDrawDaily(historyDays,volumes);
+ const rateLow=below.length?below.reduce((a,d)=>a+(volumes[d]||0),0)/below.length:null;
+ const rateHigh=above.length?above.reduce((a,d)=>a+(volumes[d]||0),0)/above.length:null;
+ const accumulated=[],scenarios={base:[],low:[],high:[]};let running=0;
+ monthDays.forEach((d,i)=>{if(d<=cutDate){running+=volumes[d]||0;accumulated.push(running);for(const k of Object.keys(scenarios))scenarios[k].push(running)}else{accumulated.push(null);scenarios.base.push(running+mean*monthDays.filter(x=>x>cutDate&&x<=d).length);scenarios.low.push(rateLow===null?null:running+rateLow*monthDays.filter(x=>x>cutDate&&x<=d).length);scenarios.high.push(rateHigh===null?null:running+rateHigh*monthDays.filter(x=>x>cutDate&&x<=d).length)}});
+ const cutoff=monthDays.findLastIndex(d=>d<=cutDate);
+ // Linhas sem amostra histórica permanecem ausentes, sem inventar taxas de cenário.
+ exCapacityDrawProjection(monthDays,accumulated,Math.max(0,cutoff),scenarios);
+ const endBase=running+mean*futureDays.length,endLow=rateLow===null?null:running+rateLow*futureDays.length,endHigh=rateHigh===null?null:running+rateHigh*futureDays.length;
+ const monthTarget=monthDays.length*meta;
+ notes.textContent=monthLabel(month)+' · '+historyDays.length+' dias úteis observados · '+futureDays.length+' dias úteis restantes · projeção pelo ritmo médio observado, não pela meta';
+ insights.innerHTML=`<div class="ex-insight-card"><span>ACUMULADO REALIZADO</span><strong>${n(running)}</strong><span>Meta mensal de referência: ${n(monthTarget)} volumes (${monthDays.length} dias × 200)</span></div><div class="ex-insight-card"><span>PROJEÇÃO · RITMO ATUAL</span><strong>${n(endBase)}</strong><span>Diferença para a meta mensal: ${n(endBase-monthTarget)} volumes</span></div><div class="ex-insight-card"><span>CENÁRIOS DE FECHAMENTO</span><strong>${endLow===null?'—':n(endLow)} / ${endHigh===null?'—':n(endHigh)}</strong><span>Abaixo / acima de 200: médias dos respectivos dias${rateLow===null||rateHigh===null?' · cenário sem amostra não estimado':''}</span></div>`;
+}
+
 function exRenderStory(){if(!DATA.length)return;const rows=exStoryRows(),allDates=latestReleaseRows(DATA).map(r=>dateKey(r.DATA_AG)).filter(Boolean).sort();let last=allDates.at(-1);if(!last)return;let first=allDates[0];if(exStoryRange){const d=new Date(last+'T12:00:00');d.setDate(d.getDate()-Number(exStoryRange)+1);first=dateKey(d)}else if(exStorySelected.month.size){const months=[...exStorySelected.month].sort();const m=months[0];if(/^\d{4}-\d{2}$/.test(m)){first=m+'-01';const maxMonth=months.at(-1);const endMonth=new Date(maxMonth+'-01T12:00:00');endMonth.setMonth(endMonth.getMonth()+1);endMonth.setDate(0);last=last<dateKey(endMonth)?last:dateKey(endMonth)}}const days=exWeekdays(first,last).filter(d=>(!$('exDateStart').value||d>=$('exDateStart').value)&&(!$('exDateEnd').value||d<=$('exDateEnd').value)),by=uniqueReleasedByDay(rows),total=days.reduce((a,d)=>a+(by[d]||0),0),avg=days.length?total/days.length:0,zero=days.filter(d=>!by[d]),low=days.filter(d=>by[d]>0&&by[d]<avg*exStoryLimit/100);const uniq=new Set(rows.map(r=>orderKey(r['Ordem de venda']))).size;const cards=[['PEDIDOS ÚNICOS',fmtInt(uniq),'Última liberação conhecida'],['MÉDIA / DIA ÚTIL',avg.toFixed(1).replace('.',','),'Pedidos por dia útil'],['DIAS ÚTEIS SEM LIBERAÇÃO',zero.length,'Segunda a sexta, sem feriados'],['DIAS ABAIXO DO LIMITE',low.length,'Abaixo de '+exStoryLimit+'% da média']];$('exStoryKpis').innerHTML=cards.map(([l,v,n])=>`<div class="card kpi"><div class="kpi-label">${l}</div><div class="kpi-value">${v}</div><div class="kpi-note">${n}</div></div>`).join('');exDrawStory(days,by,avg);
  const worst=[...days].filter(d=>by[d]>0).sort((a,b)=>by[a]-by[b]).slice(0,5);$('exStoryNarrative').innerHTML=`<div class="ex-story-alert ${zero.length?'':'ex-story-ok'}"><b>${zero.length} dias úteis sem liberação</b> no intervalo analisado. ${zero.length?'Datas: '+zero.slice(0,15).map(escapeHtml).join(', ')+(zero.length>15?'…':''): 'Não foram identificados dias úteis zerados.'}</div><div class="ex-story-alert ${low.length?'':'ex-story-ok'}"><b>${low.length} dias com desempenho abaixo de ${exStoryLimit}% da média</b> (${avg.toFixed(1).replace('.',',')} pedidos/dia útil). ${low.length?'Priorizar a análise dos dias com menor produtividade.':'Nenhum dia com atividade ficou abaixo do limite.'}</div><p class="subtitle">Menores volumes com atividade: ${worst.map(d=>escapeHtml(d)+' ('+fmtInt(by[d])+')').join(' · ')||'não disponível'}.</p><p class="subtitle">Os dias sem registros são indícios para investigação, não prova de ociosidade: feriados, ausência de carga ou falha na origem podem explicar os zeros.</p>`;
- exRenderTimingCards(rows);exDrawDetail(days,by,avg);exDetailInsights(days,by,avg);exRenderSegments(rows,days);exRenderFlow(days);exRenderLead(rows);exRenderFinal(rows,days,by,avg);
+ exRenderCapacity();exRenderTimingCards(rows);exDrawDetail(days,by,avg);exDetailInsights(days,by,avg);exRenderSegments(rows,days);exRenderFlow(days);exRenderLead(rows);exRenderFinal(rows,days,by,avg);
  const ovCount=new Map(),ovDays=new Map();DATA.forEach(r=>{const k=orderKey(r['Ordem de venda']);if(!k)return;ovCount.set(k,(ovCount.get(k)||0)+1);const day=dateKey(r.DATA_AG);if(day){if(!ovDays.has(k))ovDays.set(k,new Set());ovDays.get(k).add(day)}});const repeated=[...ovDays.values()].filter(set=>set.size>1).length,missing=DATA.filter(r=>!dateKey(r.DATA_AG)).length;$('exStoryAudit').innerHTML=`<b>${fmtInt(repeated)} OVs</b> com liberações em datas diferentes detectadas na base atual · <b>${fmtInt(missing)} registros</b> sem data de liberação (não incluídos na série diária). A identificação histórica depende de a origem preservar os eventos anteriores. Pedidos com múltiplas linhas na mesma data são contados uma única vez.`;
 }
 
