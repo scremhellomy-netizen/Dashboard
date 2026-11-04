@@ -735,9 +735,9 @@ function exCapacityCanvas(id,height){
  return {ctx,w:width,h:height,ink:css.getPropertyValue('--text').trim(),muted:css.getPropertyValue('--muted').trim(),border:css.getPropertyValue('--border').trim()};
 }
 function exCapacityDrawDaily(days,volumes){
- const {ctx,w,h,ink,muted,border}=exCapacityCanvas('exCapacityChart',340);
+ const {ctx,w,h,ink,muted,border}=exCapacityCanvas('exCapacityChart',385);
  if(!days.length){ctx.fillStyle=muted;ctx.fillText('Sem dados no período selecionado.',20,30);return}
- const L=53,R=22,T=37,B=55,pw=w-L-R,ph=h-T-B,peak=Math.max(220,...days.map(d=>volumes[d]||0))*1.22;
+ const L=53,R=22,T=64,B=55,pw=w-L-R,ph=h-T-B,peak=Math.max(220,...days.map(d=>volumes[d]||0))*1.22;
  ctx.font='11px Segoe UI';ctx.strokeStyle=border;ctx.fillStyle=muted;ctx.textAlign='left';
  for(let j=0;j<=4;j++){const y=T+j*ph/4;ctx.beginPath();ctx.moveTo(L,y);ctx.lineTo(w-R,y);ctx.stroke();ctx.fillText(fmtInt(peak*(1-j/4)),3,y+4)}
  const bw=Math.min(24,pw/days.length*.67),labelStep=Math.max(1,Math.ceil(days.length/18));
@@ -745,25 +745,47 @@ function exCapacityDrawDaily(days,volumes){
   const v=volumes[day]||0,x=L+(i+.5)*pw/days.length,y=T+ph-v/peak*ph;
   ctx.fillStyle='#0464FC';ctx.fillRect(x-bw/2,y,bw,Math.max(1,T+ph-y));
   if(i%labelStep===0||i===days.length-1){ctx.fillStyle=muted;ctx.textAlign='center';ctx.font='10px Segoe UI';ctx.fillText(day.slice(8),x,h-22)}
-  if(v!==200){ctx.fillStyle=v>200?'#16a34a':'#D92D20';ctx.font='bold 13px Segoe UI';ctx.textAlign='center';ctx.fillText(v>200?'▲':'▼',x,Math.max(16,y-17))}
-  if(days.length<=18||i%labelStep===0||i===days.length-1){ctx.fillStyle=ink;ctx.font='bold 10px Segoe UI';ctx.textAlign='center';ctx.fillText(fmtInt(v),x,Math.max(29,y-5))}
+  // Rótulo de volume em todas as colunas; diferença acima da seta, sem omissões.
+  const delta=v-200,arrowY=Math.max(34,y-20),volumeY=Math.max(57,y-5);
+  ctx.textAlign='center';ctx.font='bold 10px Segoe UI';ctx.fillStyle=ink;ctx.fillText(fmtInt(v),x,volumeY);
+  if(delta!==0){
+   const accent=delta>0?'#16a34a':'#D92D20';
+   ctx.fillStyle=accent;ctx.font='bold 12px Segoe UI';ctx.fillText(delta>0?'▲':'▼',x,arrowY);
+   ctx.font='bold 10px Segoe UI';ctx.fillText((delta>0?'+':'−')+fmtInt(Math.abs(delta)),x,arrowY-14);
+  }
  });
  const yGoal=T+ph-200/peak*ph;ctx.strokeStyle='#04C4FC';ctx.lineWidth=2;ctx.setLineDash([7,5]);ctx.beginPath();ctx.moveTo(L,yGoal);ctx.lineTo(w-R,yGoal);ctx.stroke();ctx.setLineDash([]);
  ctx.fillStyle=ink;ctx.textAlign='right';ctx.font='bold 11px Segoe UI';ctx.fillText('200',w-R,Math.max(12,yGoal-7));
  const canvas=$('exCapacityChart');canvas.onmousemove=e=>{const x=e.clientX-canvas.getBoundingClientRect().left,i=Math.floor((x-L)/pw*days.length);if(i>=0&&i<days.length){const v=volumes[days[i]]||0;canvas.title=days[i].split('-').reverse().join('/')+' · '+fmtInt(v)+' volumes · '+(v<200?'faltam '+fmtInt(200-v):v>200?'sobram '+fmtInt(v-200):'meta atingida')}else canvas.title=''};
 }
 function exCapacityDrawProjection(days,values,cutoff,scenarios){
- const {ctx,w,h,ink,muted,border}=exCapacityCanvas('exCapacityProjection',270);
+ const {ctx,w,h,ink,muted,border}=exCapacityCanvas('exCapacityProjection',310);
  if(!days.length)return;
- const L=57,R=23,T=24,B=43,pw=w-L-R,ph=h-T-B,peak=Math.max(200,...Object.values(scenarios).flat(),...values)*1.15||1;
+ const L=57,R=49,T=40,B=43,pw=w-L-R,ph=h-T-B,valid=[...values,...Object.values(scenarios).flat()].filter(v=>Number.isFinite(v));
+ const peak=Math.max(200,...valid)*1.19||1;
  ctx.font='10px Segoe UI';ctx.fillStyle=muted;ctx.strokeStyle=border;
  for(let j=0;j<=4;j++){const y=T+j*ph/4;ctx.beginPath();ctx.moveTo(L,y);ctx.lineTo(w-R,y);ctx.stroke();ctx.fillText(fmtInt(peak*(1-j/4)),3,y+4)}
  const xAt=i=>L+(days.length===1?0:i/(days.length-1))*pw,yAt=v=>T+ph-v/peak*ph;
- function line(arr,color,dashed,start=0,end=arr.length-1){ctx.strokeStyle=color;ctx.lineWidth=2.5;ctx.setLineDash(dashed?[6,5]:[]);ctx.beginPath();let started=false;for(let i=start;i<=end;i++){if(arr[i]===null||arr[i]===undefined)continue;const x=xAt(i),y=yAt(arr[i]);if(!started){ctx.moveTo(x,y);started=true}else ctx.lineTo(x,y)}ctx.stroke();ctx.setLineDash([])}
+ function line(arr,color,dashed,start=0,end=arr.length-1){ctx.strokeStyle=color;ctx.lineWidth=2.5;ctx.setLineDash(dashed?[6,5]:[]);ctx.beginPath();let started=false;for(let i=start;i<=end;i++){if(!Number.isFinite(arr[i]))continue;const x=xAt(i),y=yAt(arr[i]);if(!started){ctx.moveTo(x,y);started=true}else ctx.lineTo(x,y)}ctx.stroke();ctx.setLineDash([])}
  line(values,'#0464FC',false,0,cutoff);
  for(const [key,color] of [['base','#9444FC'],['low','#D92D20'],['high','#16a34a']])line(scenarios[key],color,true,cutoff,days.length-1);
  const step=Math.max(1,Math.ceil(days.length/12));days.forEach((day,i)=>{if(i%step===0||i===days.length-1){ctx.fillStyle=muted;ctx.textAlign='center';ctx.fillText(day.slice(8),xAt(i),h-17)}});
- ctx.fillStyle=ink;ctx.textAlign='right';ctx.font='bold 10px Segoe UI';for(const [key,color] of [['base','#9444FC'],['low','#D92D20'],['high','#16a34a']]){if(cutoff<days.length-1){ctx.fillStyle=color;ctx.fillText(fmtInt(scenarios[key].at(-1)),w-R,Math.max(12,yAt(scenarios[key].at(-1))-5))}}
+ // Rótulos em todos os pontos realizados; nas projeções, rótulos por cenário
+ // e totais finais, com deslocamento para distinguir linhas próximas.
+ ctx.textAlign='center';ctx.font='bold 9px Segoe UI';
+ for(let i=0;i<=cutoff;i++){if(!Number.isFinite(values[i]))continue;ctx.fillStyle=ink;ctx.fillText(fmtInt(Math.round(values[i])),xAt(i),Math.max(12,yAt(values[i])-10))}
+ if(cutoff<days.length-1){
+  for(const [key,color,offset] of [['base','#9444FC',-14],['low','#D92D20',13],['high','#16a34a',-28]]){
+   const arr=scenarios[key];ctx.fillStyle=color;
+   for(let i=cutoff+1;i<days.length;i++){
+    if(!Number.isFinite(arr[i]))continue;
+    const last=i===days.length-1;
+    ctx.textAlign=last?'left':'center';
+    const x=last?Math.min(w-44,xAt(i)+5):xAt(i);
+    ctx.fillText(fmtInt(Math.round(arr[i])),x,Math.max(12,Math.min(h-B-5,yAt(arr[i])+offset)));
+   }
+  }
+ }
 }
 function exRenderCapacity(){
  const meta=200,today=dateKey(new Date());
