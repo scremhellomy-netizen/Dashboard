@@ -137,6 +137,13 @@ table{border-collapse:collapse;width:100%;font-size:12px}th,td{padding:10px 12px
 .ex-cap-legend .cap-goal{border-top:3px dashed #04C4FC}.ex-cap-legend .cap-low{border-color:#D92D20}.ex-cap-legend .cap-high{border-color:#16a34a}.ex-cap-legend .cap-mid{border-color:#9444FC}
 @media(max-width:1000px){.ex-cap-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:600px){.ex-cap-kpis{grid-template-columns:1fr}}
+
+/* Cards de pilar: extensão isolada do painel de capacidade no Storytelling. */
+.ex-cap-pillars{display:grid;grid-template-columns:repeat(auto-fit,minmax(205px,1fr));gap:10px;margin:12px 0}
+.ex-cap-pillars .ex-insight-card{min-width:0}
+.ex-cap-pillars .ex-insight-card strong{font-size:19px}
+.ex-cap-pillars .ex-pillar-stat{font-size:12px;color:var(--muted);margin-top:5px}
+.ex-cap-pillars .ex-pillar-stat b{color:var(--text)}
 </style>
 </head>
 <body data-theme="dark">
@@ -254,7 +261,8 @@ table{border-collapse:collapse;width:100%;font-size:12px}th,td{padding:10px 12px
   
  <div class="card chart-card" style="margin-bottom:16px" id="exCapacityPanel">
   <div class="chart-title">Capacidade de separação · volumes liberados × meta diária</div>
-  <div class="chart-sub">Volume = soma da coluna K por Data de envio (AI) · meta de 200 volumes/dia útil · análise do mês mais recente do recorte gerencial</div>
+  <div class="chart-sub" id="exCapacityOperationNote">Volume = soma da coluna K por Data de envio (AI) · meta de 200 volumes/dia útil · análise do mês mais recente do recorte gerencial</div>
+  <div class="ex-cap-pillars" id="exCapacityPillarCards"></div>
   <div class="ex-cap-kpis" id="exCapacityKpis"></div>
   <canvas class="ex-cap-chart" id="exCapacityChart" aria-label="Volumes liberados por dia útil e linha de meta 200"></canvas>
   <div class="ex-cap-legend"><span><i></i>Volumes liberados</span><span><i class="cap-goal"></i>Meta: 200</span><span style="color:#D92D20">▼ Abaixo da meta</span><span style="color:#16a34a">▲ Acima da meta</span></div>
@@ -798,15 +806,33 @@ function exRenderCapacity(){
    return !exStorySelected[id].size||exStorySelected[id].has(norm(r[col]));
   });
  });
+ // Exibe as operações efetivamente selecionadas no filtro gerencial.
+ const operations=[...exStorySelected.operation].sort((a,b)=>a.localeCompare(b,'pt-BR'));
+ $('exCapacityOperationNote').textContent='Volume = soma da coluna K por Data de envio (AI) · meta de 200 volumes/dia útil · análise do mês mais recente do recorte gerencial · Tipo de operação: '+(operations.length?operations.join(' · '):'Todas as operações');
  const allDays=rows.map(r=>dateKey(r['Data de envio'])).sort(),latest=allDays.at(-1);
  const cards=$('exCapacityKpis'),notes=$('exCapacityForecastNote'),insights=$('exCapacityInsights');
- if(!latest){cards.innerHTML='<div class="ex-insight-card">Sem volumes com Data de envio (AI) para os filtros selecionados.</div>';notes.textContent='';insights.innerHTML='';exCapacityCanvas('exCapacityChart',340);exCapacityCanvas('exCapacityProjection',270);return}
+ const pillarCards=$('exCapacityPillarCards');
+ if(!latest){cards.innerHTML='<div class="ex-insight-card">Sem volumes com Data de envio (AI) para os filtros selecionados.</div>';pillarCards.innerHTML='';notes.textContent='';insights.innerHTML='';exCapacityCanvas('exCapacityChart',340);exCapacityCanvas('exCapacityProjection',270);return}
  // A visualização trabalha com um único mês, evitando projeções incoerentes entre meses.
  const month=latest.slice(0,7),monthEnd=dateKey(new Date(Number(month.slice(0,4)),Number(month.slice(5,7)),0));
  const requestedEnd=$('exDateEnd').value||today,cutDate=[monthEnd,requestedEnd,today].sort()[0];
  const startDate=$('exDateStart').value&&$('exDateStart').value>month+'-01'?$('exDateStart').value:month+'-01';
  const historyDays=exWeekdays(startDate,cutDate),monthDays=exWeekdays(month+'-01',monthEnd),futureDays=monthDays.filter(d=>d>cutDate);
  const volumes={};rows.forEach(r=>{const d=dateKey(r['Data de envio']);if(d.startsWith(month))volumes[d]=(volumes[d]||0)+toNumber(r.Quantidade)});
+ // Distribuição por pilar no MESMO recorte de datas e filtros do gráfico de capacidade.
+ const pillarGroups=new Map(),allOrders=new Set();let allVolume=0;
+ rows.forEach(r=>{
+  const d=dateKey(r['Data de envio']);if(d<startDate||d>cutDate||!d.startsWith(month))return;
+  const name=norm(r.PILAR)||'Não informado',ov=orderKey(r['Ordem de venda']),qty=toNumber(r.Quantidade);
+  if(!pillarGroups.has(name))pillarGroups.set(name,{orders:new Set(),volume:0});
+  const g=pillarGroups.get(name);if(ov){g.orders.add(ov);allOrders.add(ov)}
+  g.volume+=qty;allVolume+=qty;
+ });
+ const percent=(part,total)=>total?(part*100/total).toFixed(1).replace('.',',')+'%':'0,0%';
+ pillarCards.innerHTML=[...pillarGroups.entries()].sort((a,b)=>b[1].volume-a[1].volume).map(([name,g])=>
+  `<div class="ex-insight-card"><span>PILAR · ${escapeHtml(name)}</span><strong>${fmtInt(g.orders.size)} pedidos</strong><div class="ex-pillar-stat"><b>${fmtInt(g.volume)}</b> volumes · <b>${percent(g.volume,allVolume)}</b> do volume</div><div class="ex-pillar-stat">Representatividade em pedidos: <b>${percent(g.orders.size,allOrders.size)}</b></div></div>`
+ ).join('')||'<div class="ex-insight-card">Sem dados de pilar no mês analisado.</div>';
+
  const total=historyDays.reduce((a,d)=>a+(volumes[d]||0),0),mean=historyDays.length?total/historyDays.length:0;
  const deficits=historyDays.reduce((a,d)=>a+Math.max(0,meta-(volumes[d]||0)),0),surpluses=historyDays.reduce((a,d)=>a+Math.max(0,(volumes[d]||0)-meta),0);
  const below=historyDays.filter(d=>(volumes[d]||0)<meta),above=historyDays.filter(d=>(volumes[d]||0)>meta);
